@@ -1,12 +1,10 @@
 package week_9;
 
-
-import java.util.ArrayList;
 import java.util.LinkedList;
 
 /** Launches the GUI. Connects GUI to data store, and to TicketFileStorage. */
 
-public class SupportTicketManagerWithGUI {
+public class TicketProgram {
     
     
     TicketFileIO ticketFileIO;
@@ -18,7 +16,7 @@ public class SupportTicketManagerWithGUI {
     
     
     public static void main(String[] args) {
-        new SupportTicketManagerWithGUI().start();
+        new TicketProgram().start();
     }
     
     public void start() {
@@ -43,28 +41,20 @@ public class SupportTicketManagerWithGUI {
     
     protected void addTicket(Ticket newTicket) {
         
-        /* Ticket UI should call this method when user has added new ticket */
-        
-        // Add to the ticket store
+        // Add the Ticket to the ticketStore
         ticketStore.add(newTicket);
     }
     
     
     // Search the ticket store for this ticket. Returns null if ticket not found.
     protected Ticket searchById(int ticketId) {
-        
         Ticket ticket = ticketStore.getTicketById(ticketId);
         return ticket;
-        
     }
     
     
-    // Delete ticket with given ID. Returns true if ticket found and deleted, false otherwise.
-    protected boolean deleteById(int ticketId) {
-        
-        boolean deleted = ticketStore.deleteTicketById(ticketId);
-        return deleted;
-        
+    protected void resolveTicket(Ticket ticket) {
+        // TODO 7
     }
     
     
@@ -72,30 +62,20 @@ public class SupportTicketManagerWithGUI {
     protected LinkedList<Ticket> searchByDescription(String searchTerm) {
         
         LinkedList<Ticket> matchingTickets = ticketStore.searchByDescription(searchTerm);
-        return null;
+        return matchingTickets;
         
     }
-
-
-//    protected boolean deleteTicketByIssue(int id) {
-//
-//
-//        }
-
     
     
     protected LinkedList<Ticket> getAllTickets() {
-        
         LinkedList<Ticket> allTickets = ticketStore.getAllTickets();
         return allTickets;
-        
     }
     
     
     protected void quitProgram() {
         
-        //TODO Problem 6 use your new TicketFileIO class to save all open tickets to a file; save all resolved tickets to a separate file
-        
+        // TODO task 8
         
     }
     

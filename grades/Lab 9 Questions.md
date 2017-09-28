@@ -1,75 +1,95 @@
 # Lab 9: More GUI programs:  Suport Ticket application
 
-## Problem 1: Support Ticket GUI 
+This program adds a GUI to the command line Support Ticket application from a previous lab.
 
-
-This program is a prototype to manage IT support tickets for a company. Users would call or email a helpdesk to report computer problems, and this program keeps a record of all current problems. 
+This program is a prototype to manage IT support tickets for a company. Users will call or email a helpdesk to report computer problems, and this program keeps a record of all current problems. 
 
 The tickets are assigned a priority between 1-5.   
+Tickets need to store the priority, a description of the Task, the person who reported it, and a ticket ID number.
 
 1 is the most urgent (e.g. all servers down); 5 is the least (e.g. missing mouse mat). 
-When a problem is fixed, the ticket is deleted. 
 
-For this problem, create a GUI for the program you built in Lab 7 
+When a Task is fixed, the ticket is deleted and the reason for deleting the tickt is recorded. 
 
-### Problem 2:
+For this Task, you will implement a GUI for the program. 
 
-Implement a way to add a new ticket. Use a GUI component that restricts the priority entered is between 1 and 5. 
+### Task 1: TicketGUI, Set up priorityComboBox
 
-### Problem 3:
+Configure priorityComboBox so it contains the choices 1, 2, 3, 4, 5.
 
-Search boxes: by description and by ID
+### Task 2: Configure TicketGUI ticketList JList
 
-Show matching tickets in the list
+Configure `ticketList` so it will be able to display a list of Ticket objects.
+The selection mode should be `SINGLE_SELECTION`.
 
+### Task 3: Get all the open tickets for ticketList JList
 
-### Problem 4:
+Ensure that you have provided the methods to read in open Ticket data from `open_tickets.txt`. 
 
-Delete: user should be able to click on one ticket in the list and click a delete button.
+In TicketGUI, Use the manager object to request all the current open Tickets.
+Configure the ticketList to display this list of open Ticket objects.
+ 
+### Task 4: Add Ticket
 
-Use a JOptionPane show input dialog to get the resolution
+Implement the add ticket feature in TicketGUI. Add a listener to addButton which reads data from 
+descriptionTextField and reporterTextField and priorityComboBox.  Ensure that all the data needed has been entered.   If so, create a new ticket and call `manager.addTicket(newTicket)` to request that the new ticket is added to the Ticket store. 
 
-remove ticket from list, save in resovled ticket store 
+The ticketList JList should update to show all the Tickets, including the new Ticket. 
 
+If data (reporter or description or priority) is missing, display a message dialog to warn the user. Do not create a new Ticket. 
+Use the showAlertDialog in TicketGUI to show the message dialog. 
+ 
+### Task 5: Search by ID
 
-### Problem 5:
+Implement a listener for the `searchIdButton`. When this button is clicked, read the text in `idSearchTextBox`. Verify data has been entered, and that it is a positive integer. 
 
-Modify your program so you can save information about deleted tickets.
+If there is no data or the data is invalid (not an integer, or a negative integer) the `ticketList` should show an empty list, and set the `ticketListStatusDescription` JLabel to the String `INVALID_TICKET_ID`
 
-Your Tickets should be able to store another date; `resolvedDate`, the date the ticket was closed.
-And, a String that documents why the ticket was closed – the fix or the resolution for the ticket. This String should be called `resolution`
+If the ID is a positive integer then use `manager` to search for the matching ticket.
 
-Now assume that when users delete a ticket, it has been resolved in some way. Either a technician fixed the problem, or the user has figured out how to change their own screensaver, or it’s become a non-issue in some other way.
+If a ticket with this ID is found, display it in the ticketList and set the ticketListStatusDescription to `TICKET_MATCHING_ID`
 
-Now, when you delete a Ticket, your program should ask the user for the resolution. It should store the resolution, plus the current date. Now, remove this Ticket from the ticketQueue list.
+If a ticket with this ID is not found, `ticketList` should not show any Tickets and ticketListStatusDescription should be set to `NO_TICKETS_FOUND`
 
-And, add the resolved ticket to a new data structure.
+Do not show any alert dialogs. 
 
-Will you create a new class to manage the list of resolved tickets? Re-use TicketStore? Or something else?
+### Task 6: Search by Description
 
-You'll need to add some new methods to TicketUI and TicketStore. Keep your classes focused on their current roles. 
+Implement a listener for the `searchDescriptionButton`. When this button is clicked, read the text in `descriptionSearchTextBox`. Verify data has been entered.
 
-### Problem 6:
+If there is no search data, `ticketList` should be empty, and set the `ticketListStatusDescription` JLabel to the String `NO_TICKETS_FOUND`
 
+If there is search data, then use `manager` to search for the matching tickets.
 
-Re-use the code from Lab 7. 
+If a tickets containing the description are found (remember the search should not be case sensitive), display all the matching Tickets in `ticketList` and set `ticketListStatusDescription` to `TICKETS_MATCHING_DESCRIPTION`
 
-When the program is closed, all the data is lost.  Add the ability to save all data to file.  You can decide how to organize and structure the data in your files. 
+If no tickets matching this description are found, `ticketList` should not show any Tickets and ticketListStatusDescription should be set to `NO_TICKETS_FOUND`
 
-Create a new class to manage the file input and output. Question_3_Support_Ticket_Manager will use this class when the program starts and ends.  
+Do not show any alert dialogs. 
 
-When the program closes, write out all the data about all open tickets to one file. 
-Write all data about tickets that have been resolved in this session, to a separate file.
+### Task 7: Delete Ticket
 
-Resolved tickets should go into one file, per day. This file should have today’s date in the filename. Something like `resolved_tickets_as_of_february_20_2014.txt` perhaps? If you run the program twice on one day, make sure you don't overwrite existing tickets in that day's file. (Hint: you can open a file in append mode). 
+To delete Tickets, the user will select one Ticket in `ticketList` and click the `deleteSelectedButton` button.
 
-Open tickets should go in another file called `open_tickets.txt`.
+Add a listener to `deleteSelectedButton` that checks if a Ticket is selected. Show an alert dialog with an appropriate message if no Ticket is selected in `ticketList`.
 
-### Problem 7: 
+If a Ticket is selected in `ticketList`, then use TicketGUI's `showInputDialog` method to show an JOptionPane input dialog. 
 
-When your program opens, it should look for a file called `open_tickets.txt`. If this file exists, read in this file, and create ticket objects, and store these in the TicketStore object list so the user can see all open tickets.
+The user will be able to click the Cancel button, if they don't want to delete/resolve the ticket. You should not delete the selected Ticket.
+
+Or, the user will type in a resolution String and click the OK button. Use the String entered to set the resolution of the ticket. Also, set the date it was resolved. Call manager's resolveTicket to remove this Ticket from the ticket store, and add it to the resolved tickets store. 
+
+You'll need to implemnt 
+
+### Task 8: Save and Quit 
+
+Add a listener to `saveAndQuitButton`. This should call the `manager.quitProgram()` method to save all current open and resolved Tickets to files, as implemented in the previous lab.
+ TicketProgram should then exit the program with a `System.exit(0)` call.
+
+### Task 9: Load Tickets on relaunch
+
+When your program opens, it should read in open Ticket information from `open_tickets.txt`, if this file exists. Your program should provide these to the GUI so all open Tickets are shown in `ticketList` when the program opens. 
 
 You don't need to read in the previous resolved tickets. 
 
-What happens to ticket IDs when the program is closed and opened? Make sure they don't reset to 1 when the user restarts the program.
-
+Ensure that you include your mechanism for generating unique positive integer IDs for your Ticket objects. 

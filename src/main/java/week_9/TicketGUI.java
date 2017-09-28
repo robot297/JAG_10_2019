@@ -1,17 +1,14 @@
 package week_9;
 
-import com.sun.codemodel.internal.JOp;
-
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.LinkedList;
+
 
 public class TicketGUI extends JFrame {
     
     
-    protected JPanel mainPanel;
+    // TODO complete the tasks described in grades/Lab 9 Questions.md
     
+    protected JPanel mainPanel;
     
     // Components for adding tickets
     protected JPanel addTicketPanel;
@@ -49,12 +46,13 @@ public class TicketGUI extends JFrame {
     static final String INVALID_TICKET_ID = "Invalid ticket ID";
     
     
+    // A reference to the SupportTicketManagerWithGUI object
+    // The GUI will call the methods in this class to add, search for, and delete tickets.
+    // See example in quitProgram method.
+    TicketProgram manager;
     
-    SupportTicketManagerWithGUI manager;
     
-    // Messages to show in
-    
-    TicketGUI(SupportTicketManagerWithGUI manager) {
+    TicketGUI(TicketProgram manager) {
         
         this.manager = manager;
         
@@ -107,52 +105,11 @@ public class TicketGUI extends JFrame {
     
     
     
-    protected void addTicket() {
-        
-        // TODO call this method from the addButton event handler.
-        // TODO Get ticket data from user interface,
-        // TODO validate that all required data is entered
-        // TODO create a new Ticket object
-        
-        manager.addTicket(null);  // TODO replace null with your new Ticket
-        
-        // TODO update list of all tickets
-    }
-    
-    
-    protected void searchById() {
-        
-       // TODO update list of tickets to just show the matching ticket, or a not found message.
-        
-    }
-    
-    
-    protected void deleteById() {
-        
-        // Figure out ID and
-        
-    }
-    
-    
-    protected void searchByIssue() {
-        
-        // TODO problem 3 implement this method.
-        
-    }
-    
-    
-    
-    protected void displayAllTickets() {
-        // TODO Call this to update the allTickets JList
-    }
     
     
     
     protected void quitProgram() {
-        
         manager.quitProgram();
-        
-        //TODO Problem 6 use your new TicketFileIO class to save all open tickets to a file; save all resolved tickets to a separate file
     }
     
     //
@@ -162,7 +119,7 @@ public class TicketGUI extends JFrame {
     
     
     // If user cancels, this will return null.
-    protected String showUserInputDialog(String question) {
+    protected String showInputDialog(String question) {
         return JOptionPane.showInputDialog(this, question);
     }
     
