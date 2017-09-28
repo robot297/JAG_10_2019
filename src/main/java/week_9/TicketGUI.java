@@ -19,7 +19,7 @@ public class TicketGUI extends JFrame {
     
     // Components for displaying ticket list
     protected JPanel ticketListPanel;
-    protected JList ticketList;
+    protected JList<Ticket> ticketList;
     protected JLabel ticketListStatusDescription;
     
     // Components for searching
@@ -60,15 +60,14 @@ public class TicketGUI extends JFrame {
         pack();
         setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    
-    
+        
         // TODO complete the tasks described in grades/Lab 9 Questions.md
 
-        
     }
     
     
     
+    // Call this method to quit the program. The tests expect you to use it.
     protected void quitProgram() {
         manager.quitProgram();
     }

@@ -203,6 +203,7 @@ public class TicketTest {
     
     /* *************** Test TicketUI Methods **********************/
 
+    // TASK 1 Configure Combobox
 
     @Test(timeout=2000)  // Only wait 2 seconds for this test to complete.
     public void testPriorityComboBoxConfigured() throws Exception {
@@ -210,7 +211,7 @@ public class TicketTest {
         // empty ticket list
 
         TicketProgram program = new TicketProgram();
-        program.start();
+        program.startGUI();
         
         JComboBox priorityCombo = program.ticketUI.priorityComboBox;
 
@@ -226,35 +227,60 @@ public class TicketTest {
                     comboItem.equals(vals[x]));
         }
     }
+
+    // TASK 2 Configure JList
     
     
     @Test(timeout=2000)  // Only wait 2 seconds for this test to complete.
     public void testTicketListConfigured() throws Exception {
-        // shows example ticket list in correct order
+        
         // set to single selection
+        // Model uses Ticket objects
+        
+        TicketProgram program = new TicketProgram();
+        
+        //bypass the load tickets method
+        program.startGUI();
+        
+        JList ticketList = program.ticketUI.ticketList;
+                
+        try {
+            DefaultListModel model = (DefaultListModel) ticketList.getModel();
+        } catch (ClassCastException cce) {
+            fail("Create a DefaultListModel<Ticket> and use it as the ticketList data model. It should only store Ticket objects");
+        }
+        
+        // Should be single selection mode
+        int listSelectionMode = ticketList.getSelectionMode();
+        
+        assertEquals("ticketList should use the single selection mode, to only select one ticket at a time.",
+                listSelectionMode, ListSelectionModel.SINGLE_SELECTION);
+        
+    }
+    
+    
+    // TASK 3 Get all Data
+    
+    @Test(timeout=2000)
+    public void testTicketListGetAllData() throws Exception {
+        // shows example ticket list in correct order
         
         TicketStore testTicketStore = new TicketStore();
-    
-        Ticket test1 = new Ticket("Server keeps rebooting", 2, "user 1", new Date());  // 2
-        Ticket test2 = new Ticket("Mouse mat stolen", 3, "user 2", new Date());          // 3
-    
+        
+        Ticket test1 = new Ticket("Server keeps rebooting", 2, "user 1", new Date());
+        Ticket test2 = new Ticket("Mouse mat stolen", 3, "user 2", new Date());
+        
         testTicketStore.add(test1); testTicketStore.add(test2);
         
         TicketProgram program = new TicketProgram();
         
         // use test ticket store
         program.ticketStore = testTicketStore;
-    
+        
         //bypass the load tickets method
         program.startGUI();
         
         JList ticketList = program.ticketUI.ticketList;
-    
-        // Should be single selection mode
-        int listSelectionMode = ticketList.getSelectionMode();
-        
-        assertEquals("ticketList should use the single selection mode, to only select on ticket at a time.",
-                listSelectionMode, ListSelectionModel.SINGLE_SELECTION);
         
         // Should be two tickets in list, in the given order (server reboot then mouse mat)
         assertEquals("With a test TicketList of 2 tickets, there should be 2 tickets in your JList", 2, ticketList.getModel().getSize());
@@ -265,30 +291,28 @@ public class TicketTest {
             
             String msg = String.format("Using a test ticket list of \n%s, \n%s. \n\nYour JList should show these tickets in this order. \nFound \n%s \n%s",
                     test1, test2, ticket1, ticket2);
-                            
+            
             assertTrue(msg, sameOpenTicket(ticket1, test1));
             assertTrue(msg, sameOpenTicket(ticket2, test2));
             
         } catch (ClassCastException cce) {
             fail("Your JList should be a list of Ticket objects");
         }
-        
     }
     
     
-    @Test(timeout=2000)  // Only wait 2 seconds for this test to complete.
-    public void testAddTicketValidData() throws Exception {
+    @Test(timeout=2000)
+    public void testAddTicketToEmptyListValidData() throws Exception {
     
         System.out.println("If this test times out, ensure that you don't show any dialogs after clicking " +
-                "the add button. If the ticket data is valid, add it directly to the JList.");
-        // enter data
-        // validate
-        // add
-        // verify shows up in ticket list
-    
-        TicketProgram.openticketsFile = null;
+                "the add button if the data is valid. If the ticket data is valid, add it directly to the JList.");
+        
+        String msg = "Ticket added to the list should have the same data as that entered into GUI. " +
+                "The date need not be exactly the same but it must be close.";
         
         TicketProgram program = new TicketProgram();
+        program.startGUI();
+        
         TicketGUI gui = program.ticketUI;
         
         // Example data for ticket
@@ -303,28 +327,109 @@ public class TicketTest {
         gui.priorityComboBox.setSelectedItem(priority);
         
         // click add button
-        
         gui.addButton.doClick();
         
         // Now ticket should be the first and only element in JList
-        
         assertEquals("After adding 1 ticket, there should be one ticket in the JList", 1, gui.ticketList.getModel().getSize() );
         
-        Ticket actualTicket = (Ticket) gui.ticketList.getModel().getElementAt(0);
+        Ticket actualTicket = gui.ticketList.getModel().getElementAt(0);
     
         System.out.println("Expected ticket =" + expected);
         System.out.println("Actual ticket created by the program =" + actualTicket);
+        
+        assertTrue(msg, sameOpenTicket(actualTicket, expected, 4000));
+        
+        // Example data for another ticket
+        description = "Mouse mat fell off desk"; reporter = "Another User";
+        priority = 1;
     
-        assertEquals("Ticket added to the list should have the same data as that entered into GUI", expected.getDescription(), actualTicket.getDescription());
-        assertEquals("Ticket added to the list should have the same data as that entered into GUI", expected.getPriority(), actualTicket.getPriority());
-        assertEquals("Ticket added to the list should have the same data as that entered into GUI", expected.getReporter(), actualTicket.getReporter());
+        Ticket expected2 = new Ticket(description, priority, reporter , new Date());
+    
+        // enter data
+        gui.descriptionTextField.setText(description);
+        gui.reporterTextField.setText(reporter);
+        gui.priorityComboBox.setSelectedItem(priority);
+    
+        // click add button
+        gui.addButton.doClick();
+    
+        // Now ticket should be the first and only element in JList
+        assertEquals("After adding 1 ticket, there should be two tickets in the JList", 2, gui.ticketList.getModel().getSize() );
+    
+        Ticket actualTicket2 = gui.ticketList.getModel().getElementAt(0);   // This one is way more urgent so should be at the top
+        Ticket actualTicket1 = gui.ticketList.getModel().getElementAt(1);   // This one is way more urgent so should be at the top
+    
+        System.out.println("Created another ticket. Expected ticket =" + expected2);
+        System.out.println("Actual ticket created by the program =" + actualTicket2);
         
-        // Date should be close (within, for example, 3 seconds)
+        assertTrue(msg, sameOpenTicket(actualTicket, expected, 4000));
+        assertTrue(msg, sameOpenTicket(actualTicket2, expected2, 4000));
         
-        assertEquals("Ticket added to the list should have the same data as that entered into GUI. " +
-                "The date will not be exactly the same but should be within a few seconds.", expected.getDateReported().getTime(), actualTicket.getDateReported().getTime(), 3000);
     }
     
+    
+    @Test(timeout=2000)
+    public void testAddTicketAlreadyPopulatedListValidData() throws Exception {
+        
+       TicketGUI gui = createGUIWithTestData();
+        
+        // Example data for new ticket
+        String description = "Server needs updating", reporter = "User";
+        int priority = 4;
+    
+        Ticket expected = new Ticket(description, priority, reporter , new Date());
+    
+        // enter data
+        gui.descriptionTextField.setText(description);
+        gui.reporterTextField.setText(reporter);
+        gui.priorityComboBox.setSelectedItem(priority);
+    
+        // click add button
+        gui.addButton.doClick();
+    
+        // Now ticket should be the first and only element in JList
+        assertEquals("After adding 1 ticket to a list with 3 tickets in, there should be 4 tickets in the JList",
+                4, gui.ticketList.getModel().getSize());
+    
+        Ticket actualTicket = gui.ticketList.getModel().getElementAt(2);    // New ticket should be at position 2
+    
+        System.out.println("Original test ticket list " + gui.manager.getAllTickets());
+        System.out.println("Expected ticket =" + expected);
+        System.out.println("Actual ticket created by the program =" + actualTicket);
+    
+        assertTrue("A new ticket with priority 4 to the test list should be added at position 2", sameOpenTicket(actualTicket, expected, 4000));
+        
+    }
+    
+    @Test(timeout=2000)
+    public void testAddTicketInvalidData() throws Exception {
+        
+        // Example data for new ticket
+        String description = "Server needs updating", reporter = "User";
+        int priority = 4;
+        
+        
+        // enter data
+        gui.descriptionTextField.setText(description);
+        gui.reporterTextField.setText(reporter);
+        gui.priorityComboBox.setSelectedItem(priority);
+        
+        // click add button
+        gui.addButton.doClick();
+        
+        // Now ticket should be the first and only element in JList
+        assertEquals("After adding 1 ticket to a list with 3 tickets in, there should be 4 tickets in the JList",
+                4, gui.ticketList.getModel().getSize());
+        
+        Ticket actualTicket = gui.ticketList.getModel().getElementAt(2);    // New ticket should be at position 2
+        
+        System.out.println("Original test ticket list " + gui.manager.getAllTickets());
+        System.out.println("Expected ticket =" + expected);
+        System.out.println("Actual ticket created by the program =" + actualTicket);
+        
+        assertTrue("A new ticket with priority 4 to the test list should be added at position 2", sameOpenTicket(actualTicket, expected, 4000));
+        
+    }
     
     
     @Test(timeout=2000)
@@ -336,14 +441,10 @@ public class TicketTest {
         Ticket test3 = new Ticket("Mouse mat stolen", 3, "user 2", new Date());
     
         testTicketStore.add(test2); testTicketStore.add(test3);
-    
         TicketProgram program = new TicketProgram();
     
-        // use test ticket store
-        program.ticketStore = testTicketStore;
-    
-        //bypass the load tickets method
-        program.startGUI();
+        program.ticketStore = testTicketStore;  // use test ticket store
+        program.startGUI();  // bypass load from file
         
         TicketGUI gui = program.ticketUI;
         JList ticketList = gui.ticketList;
@@ -353,16 +454,16 @@ public class TicketTest {
         gui.searchIdButton.doClick();
         
         // List should only show ticket 2
-    
         Ticket expected = (Ticket )ticketList.getModel().getElementAt(0);
         
         assertTrue("After searching for ticket ID that exists, only that matching ticket should be" +
                 " shown in the JList", sameOpenTicket(test2, expected));
         assertEquals("After searching for ticket ID that exists, only that matching ticket should be" +
-                " shown in the JList", 1, ticketList.getModel().getSize() );
+                " shown in the JList", 1, ticketList.getModel().getSize());
     
         // Update search status
-        assertEquals("After ticket found by ID, update the ticketListStatusDescription JLabel", TicketGUI.TICKET_MATCHING_ID, gui.ticketListStatusDescription.getText());
+        assertEquals("After ticket found by ID, update the ticketListStatusDescription JLabel",
+                TicketGUI.TICKET_MATCHING_ID, gui.ticketListStatusDescription.getText());
         
     
         // Search for ticket 3, should now only show ticket 3 in the list
@@ -379,7 +480,8 @@ public class TicketTest {
         assertEquals("After searching for ticket ID that exists, only that matching ticket should be" +
                 " shown in the JList", 1, ticketList.getModel().getSize() );
     
-        assertEquals("After ticket found by ID, update the ticketListStatusDescription JLabel", TicketGUI.TICKET_MATCHING_ID, gui.ticketListStatusDescription.getText());
+        assertEquals("After ticket found by ID, update the ticketListStatusDescription JLabel",
+                TicketGUI.TICKET_MATCHING_ID, gui.ticketListStatusDescription.getText());
     
     
         // Search for ticket id = 4, does not exist in list
@@ -392,53 +494,32 @@ public class TicketTest {
         assertEquals("After searching for ticket ID that does not exist, the JList should be empty",
                 0, ticketList.getModel().getSize() );
 
-        assertEquals("After searching for ID that doesn't exist, update the ticketListStatusDescription JLabel to " + gui.NO_TICKETS_FOUND,
-                gui.NO_TICKETS_FOUND, gui.ticketListStatusDescription.getText());
-    
-    
-    
-        // Search for ticket id = "", empty string, does not exist in list
-    
-        gui.idSearchTextBox.setText("");
-        gui.searchIdButton.doClick();
-        // List should be empty, invalid message shown
-        assertEquals("After searching for ticket ID \"\" the JList should be empty",
-                0, ticketList.getModel().getSize() );
-        assertEquals("After searching for invalid ID, update the ticketListStatusDescription JLabel to " + TicketGUI.NO_TICKETS_FOUND,
-                TicketGUI.INVALID_TICKET_ID, gui.ticketListStatusDescription.getText());
-    
-    
-        // Search for non-numerical ticket id = "pizza", does not exist in list
-    
-        gui.idSearchTextBox.setText("pizza");
-        gui.searchIdButton.doClick();
-        // List should be empty, invalid message shown
-        assertEquals("After searching for ticket ID \"pizza\" the JList should be empty",
-                0, ticketList.getModel().getSize() );
-        assertEquals("After searching for invalid ID, update the ticketListStatusDescription JLabel to " + gui.NO_TICKETS_FOUND,
-                TicketGUI.INVALID_TICKET_ID, gui.ticketListStatusDescription.getText());
-    
-    
-        // Search for negative ticket id = "-2", does not exist in list
-    
-        gui.idSearchTextBox.setText("-2");
-        gui.searchIdButton.doClick();
-        // List should be empty, invalid message shown
-        assertEquals("After searching for ticket ID \"-2\" the JList should be empty",
-                0, ticketList.getModel().getSize() );
-        assertEquals("After searching for invalid ID, update the ticketListStatusDescription JLabel to " + TicketGUI.NO_TICKETS_FOUND,
-                TicketGUI.INVALID_TICKET_ID, gui.ticketListStatusDescription.getText());
-    
+        assertEquals("After searching for ID that doesn't exist, update the ticketListStatusDescription JLabel to " + TicketGUI.NO_TICKETS_FOUND,
+                TicketGUI.NO_TICKETS_FOUND, gui.ticketListStatusDescription.getText());
         
-    
+        // Searches for things that are not valid IDs
+        invalidIDSearch(gui, "");
+        invalidIDSearch(gui, "Pizza");
+        invalidIDSearch(gui, "-2");    // negative integers are not valid
+        
         // Click show all
-        
         gui.showAllTicketsButton.doClick();
     
         assertEquals("Update the ticketListStatusDescription JLabel to " + TicketGUI.ALL_TICKETS,
                 TicketGUI.ALL_TICKETS, gui.ticketListStatusDescription.getText());
         
         assertEquals("When show all tickets is clicked, show all tickets in the JList", 2, ticketList.getModel().getSize());
+    
+    }
+    
+    private void invalidIDSearch(TicketGUI gui, String searchText) {
+        gui.idSearchTextBox.setText(searchText);
+        gui.searchIdButton.doClick();
+        // List should be empty, invalid message shown
+        assertEquals("After searching for ticket ID \"" + searchText + "\" the JList should be empty",
+                0, gui.ticketList.getModel().getSize() );
+        assertEquals("After searching for invalid ID, update the ticketListStatusDescription JLabel to " + TicketGUI.NO_TICKETS_FOUND,
+                TicketGUI.INVALID_TICKET_ID, gui.ticketListStatusDescription.getText());
     
     }
     
@@ -487,8 +568,7 @@ public class TicketTest {
     
         assertEquals("After ticket found by ID, update the ticketListStatusDescription JLabel",
                 TicketGUI.TICKETS_MATCHING_DESCRIPTION, gui.ticketListStatusDescription.getText());
-    
-    
+        
         // Search for ticket "Server keeps rebooting", should now only show ticket 2 in the list
     
         gui.descriptionSearchTextBox.setText("Server keeps rebooting");
@@ -503,52 +583,90 @@ public class TicketTest {
        
         assertEquals("After ticket found by ID, update the ticketListStatusDescription JLabel",
                 TicketGUI.TICKETS_MATCHING_DESCRIPTION, gui.ticketListStatusDescription.getText());
-    
-    
+        
         // Search for ticket text = "Powerpoint", does not exist in list
     
         gui.descriptionSearchTextBox.setText("Powerpoint");
         gui.searchDescriptionButton.doClick();
     
-        // List should be empty, invalid message shown
+        // List should be empty, no ticket found message shown
         assertEquals("After searching for ticket description \"Powerpoint\" the JList should be empty",
                 0, ticketList.getModel().getSize() );
-        assertEquals("After searching for description that does not match any tickets, update the ticketListStatusDescription JLabel to " + gui.NO_TICKETS_FOUND,
+        assertEquals("After searching for description that does not match any tickets, update the ticketListStatusDescription JLabel to " + TicketGUI.NO_TICKETS_FOUND,
                 TicketGUI.NO_TICKETS_FOUND, gui.ticketListStatusDescription.getText());
     
         
         // Search for empty string, should return no tickets
         gui.idSearchTextBox.setText("");
         gui.searchIdButton.doClick();
-        // List should be empty, invalid message shown
+        
+        // List should be empty, no ticket found message shown
         assertEquals("After searching for ticket description with an empty string, the JList should be empty",
                 0, ticketList.getModel().getSize() );
-        assertEquals(""After searching for ticket description with an empty string, " + gui.NO_TICKETS_FOUND,
+        assertEquals("After searching for ticket description with an empty string, " + TicketGUI.NO_TICKETS_FOUND,
                 TicketGUI.INVALID_TICKET_ID, gui.ticketListStatusDescription.getText());
     
         
-    
         // Click show all
     
         gui.showAllTicketsButton.doClick();
     
         assertEquals("Update the ticketListStatusDescription JLabel to " + gui.ALL_TICKETS,
-                gui.ALL_TICKETS, gui.ticketListStatusDescription.getText());
+                TicketGUI.ALL_TICKETS, gui.ticketListStatusDescription.getText());
         
-        assertEquals("When show all tickets is clicked, show all tickets in the JList",
-                3, ticketList.getModel().getSize());
-    
-    
-    
-    
+        assertEquals("When show all tickets is clicked, show all tickets in the JList", 3, ticketList.getModel().getSize());
+        
     }
     
     
     @Test(timeout=2000)  // Only wait 2 seconds for this test to complete.
     public void testDeleteSelected() throws Exception {
-        //get resolutuoin
+       
+        TicketGUI gui = createGUIWithEmptyTicketStore();
+        
+        gui.descriptionTextField.setText("");
+        gui.reporterTextField.setText("");
+        gui.priorityComboBox.setSelectedItem(null);
+        
+        gui.addButton.doClick();
+        
+        
+        
+        // On the back end, resolved tickets should contain this ticket
     }
     
+    
+    class TicketGUIMockDialog extends TicketGUI {
+        TicketGUIMockDialog(TicketProgram t){ super(t);}
+        
+        private boolean wasAlertCalled = false;
+        
+        public boolean checkAlertWasCalled() {
+            boolean copyToReturn = wasAlertCalled;
+            wasAlertCalled = false;
+            return copyToReturn;
+        }
+        
+        @Override
+        protected void showAlertDialog(String msg){
+            // do nothing so the program does not show an alert dialog
+            wasAlertCalled = true;
+        }
+        
+        // Set this to force showInputDialog to return a particular value
+        
+        String mockUserInput;
+        
+        @Override
+        protected String showInputDialog(String msg) {
+            if (mockUserInput == null) { fail("you need to set the mockUserInput value before using this in a test. This is clara's fault, pls let her know. ");}
+            String copyToReturn = new String(mockUserInput);
+            mockUserInput = null;
+            return copyToReturn;
+        }
+        
+        
+    }
     
     
     
@@ -585,23 +703,17 @@ public class TicketTest {
     @Test(timeout=3000)
     public void saveAndRestoreTickets() throws Exception {
 
+        
+        fail();
         // Provide dummy return values from any input used
         // Do not overwrite user's ticket file
         
         TicketProgram.openticketsFile = FileUtils.uniqueFilename("support_ticket_gui");
         
-        TicketProgram program = new TicketProgram();
-
-        // Test tickets with  different priorities
-        Ticket test1 = new Ticket("Mouse mat stolen", 5, "reporter", new Date());
-        Ticket test2 = new Ticket("Word needs updating", 3, "reporter", new Date());
-
-        // Force these tickets into the store
-       
-        program.addTicket(test1);  program.addTicket(test2);
-
-        program.quitProgram();    // End program. These tickets should be saved to a file.
-    
+        TicketGUI gui = createGUIWithTestData();
+        
+        gui.saveAndQuitButton.doClick();   // This should invoke the save and quit method.
+        
         TicketProgram relaunchedProgram = new TicketProgram();
 
         // The tickets should have been read from a file, and be available.
@@ -617,8 +729,8 @@ public class TicketTest {
         Ticket read_2 = ticketList_relaunch.pop();
         String msg = "Read all data from the file to create a new ticket list.  " +
                 "Wrote out \n%s\n and got \n%s\n back. Make sure all the data is the same as the original ticket.";
-        assertTrue(String.format(msg, test1, read_1), sameOpenTicket(ticketList_relaunch.pop(), test2) );
-        assertTrue(String.format(msg, test2, read_2), sameOpenTicket(ticketList_relaunch.pop(), test2) );
+//        assertTrue(String.format(msg, test1, read_1), sameOpenTicket(ticketList_relaunch.pop(), test2) );
+//        assertTrue(String.format(msg, test2, read_2), sameOpenTicket(ticketList_relaunch.pop(), test2) );
 
     }
     
@@ -628,24 +740,78 @@ public class TicketTest {
     
         fail();
     }
+    
+    
+    
+    
+    
+    private TicketGUI createGUIWithEmptyTicketStore() {
+    
+        TicketStore testTicketStore = new TicketStore();
         
+        TicketProgram program = new TicketProgram();
+        program.ticketStore = testTicketStore;     // use test ticket store
+        //program.startGUI();   //bypass the load tickets method
+    
+        TicketGUIMockDialog gui = new TicketGUIMockDialog(program);
+        program.ticketUI = gui;
+    
+        return gui;
+   
+    }
+    
+    
+    private TicketGUIMockDialog createGUIWithTestData() {
         
+        TicketStore testTicketStore = new TicketStore();
         
+        Ticket test2 = new Ticket("Server keeps rebooting", 1, "user 1", new Date());
+        Ticket test3 = new Ticket("Mouse mat stolen", 3, "user 2", new Date());
+        Ticket test4 = new Ticket("Mouse stolen", 5, "user 2", new Date());
         
-        private boolean sameOpenTicket(Ticket t1, Ticket t2) throws Exception {
+        testTicketStore.add(test2); testTicketStore.add(test3); testTicketStore.add(test4);
+        
+        TicketProgram program = new TicketProgram();
+        program.ticketStore = testTicketStore;     // use test ticket store
+        //program.startGUI();   //bypass the load tickets method
+        
+        TicketGUIMockDialog gui = new TicketGUIMockDialog(program);
+        program.ticketUI = gui;
+        
+        return gui;
+    }
+    
+        
+    private boolean sameOpenTicket(Ticket t1, Ticket t2) throws Exception {
+        // Could override .equals in the Ticket class, but not guaranteed that student will implement extra fields
+        // Overriding .equals requires hashcode to be overriden too, and that's out of scope for this problem
+        
+        return sameOpenTicket(t1, t2, 0);
+
+    }
+    
+    
+    private boolean sameOpenTicket(Ticket t1, Ticket t2, long acceptableMsDifferenceInDate) throws Exception {
         // Could override .equals in the Ticket class, but not guaranteed that student will implement extra fields
         // Overriding .equals requires hashcode to be overriden too, and that's out of scope for this problem
         
         if (t1.getTicketID() != t2.getTicketID()) { return false; }
-        if (!(t1.getDateReported().equals(t2.getDateReported())))  { return false; }
         if (!(t1.getDescription().equals(t2.getDescription())))  { return false; }
         if (!(t1.getReporter().equals(t2.getReporter())))  { return false; }
-
+        
+        long dateDiff = Math.abs(t1.getDateReported().getTime() - t2.getDateReported().getTime());
+        if (dateDiff > acceptableMsDifferenceInDate) {
+            // Within 5 seconds
+            return false;
+        }
+        
         return true;
-
+        
     }
+    
 
-
+    
+    
     @Test
     public void testManualChecksQuestion() {
         fail("This test is supposed to fail. Tests can't check every aspect of this program. " +

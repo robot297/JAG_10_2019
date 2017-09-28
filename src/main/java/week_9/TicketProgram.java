@@ -20,12 +20,13 @@ public class TicketProgram {
     }
     
     public void start() {
-     //   loadTickets();
+        loadTickets();  // TODO uncomment before publishing
         startGUI();
     }
     
     public void loadTickets() {
-        
+    
+        System.out.println("*******************DO NOT CALL THIS IN TESTS *************");
         TicketFileIO ticketFileIO = new TicketFileIO();
         LinkedList<Ticket> openTickets = ticketFileIO.loadTickets(openticketsFile);
         
@@ -35,7 +36,7 @@ public class TicketProgram {
     }
     
     public void startGUI() {
-        TicketGUI gui = new TicketGUI(this);
+        ticketUI = new TicketGUI(this);
     }
     
     

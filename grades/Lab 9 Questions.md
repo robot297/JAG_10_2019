@@ -19,7 +19,7 @@ Configure priorityComboBox so it contains the choices 1, 2, 3, 4, 5.
 
 ### Task 2: Configure TicketGUI ticketList JList
 
-Configure `ticketList` so it will be able to display a list of Ticket objects.  The Ticket objects should be shown in priority order, most urgent first. TicketStore should already be returning Ticket lists in the correct order.
+Configure `ticketList` so it will be able to display a list of Ticket objects. Use generic types. The Ticket objects should be shown in priority order, most urgent first. TicketStore should already be returning Ticket lists in the correct order.
 
 The selection model should be `SINGLE_SELECTION`.
 
