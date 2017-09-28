@@ -75,20 +75,27 @@ Add a listener to `deleteSelectedButton` that checks if a Ticket is selected. Sh
 
 If a Ticket is selected in `ticketList`, then use TicketGUI's `showInputDialog` method to show an JOptionPane input dialog. 
 
-The user will be able to click the Cancel button, if they don't want to delete/resolve the ticket. You should not delete the selected Ticket.
+The user will be able to click the Cancel button, if they don't want to delete/resolve the ticket. You should not delete the selected Ticket. The `ticketList` should not change.
 
 Or, the user will type in a resolution String and click the OK button. Use the String entered to set the resolution of the ticket. Also, set the date it was resolved. Call manager's resolveTicket to remove this Ticket from the ticket store, and add it to the resolved tickets store. 
 
-You'll need to implemnt 
+You'll need to implement TicketProgram's `resolveTicket(Ticket)` method.
+
+The GUI should update `ticketList` so the deleted Ticket is no longer in the list. Display all the remaining open Tickets. `ticketListStatusDescription` should show the String `ALL_TICKETS`. 
 
 ### Task 8: Save and Quit 
 
-Add a listener to `saveAndQuitButton`. This should call the `manager.quitProgram()` method to save all current open and resolved Tickets to files, as implemented in the previous lab.
+Add a listener to `saveAndQuitButton`. This should call the `manager.quitProgram()` method, which will use TicketFileIO to to save all current open and resolved Tickets to files, as implemented in the previous lab.
+
+You should be able to use the same code written in the previous version of this program.
+
  TicketProgram should then exit the program with a `System.exit(0)` call.
 
 ### Task 9: Load Tickets on relaunch
 
 When your program opens, it should read in open Ticket information from `open_tickets.txt`, if this file exists. Your program should provide these to the GUI so all open Tickets are shown in `ticketList` when the program opens. 
+
+You should be able to use the same code written in the previous version of this program.
 
 You don't need to read in the previous resolved tickets. 
 
