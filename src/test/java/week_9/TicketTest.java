@@ -334,13 +334,6 @@ public class TicketTest {
     @Test(timeout=2000)  // Only wait 2 seconds for this test to complete.
     public void testSearchById() throws Exception {
     
-        System.out.println("If this test times out, ensure that you don't show any dialogs after clicking " +
-                "the add button. If the ticket data is valid, add it directly to the JList.");
-        // enter data
-        // validate
-        // add
-        // verify shows up in ticket list
-    
         TicketStore testTicketStore = new TicketStore();
     
         Ticket test2 = new Ticket("Server keeps rebooting", 2, "user 1", new Date());  // 2
@@ -377,7 +370,7 @@ public class TicketTest {
     
         // Update search status
         
-        assertEquals("Update the ticketListStatusDescription JLabel", gui.TICKET_MATCHING_ID, gui.ticketListStatusDescription.getText());
+        assertEquals("After ticket found by ID, update the ticketListStatusDescription JLabel", gui.TICKET_MATCHING_ID, gui.ticketListStatusDescription.getText());
         
     
         // Search for ticket 3, should now only show ticket 3 in the list
@@ -395,7 +388,7 @@ public class TicketTest {
         assertEquals("After searching for ticket ID that exists, only that matching ticket should be" +
                 " shown in the JList", 1, ticketList.getModel().getSize() );
     
-        assertEquals("Update the ticketListStatusDescription JLabel", gui.TICKET_MATCHING_ID, gui.ticketListStatusDescription.getText());
+        assertEquals("After ticket found by ID, update the ticketListStatusDescription JLabel", gui.TICKET_MATCHING_ID, gui.ticketListStatusDescription.getText());
     
     
         // Search for ticket id = 4, does not exist in list
@@ -409,17 +402,194 @@ public class TicketTest {
         assertEquals("After searching for ticket ID that does not exist, the JList should be empty",
                 0, ticketList.getModel().getSize() );
 
-        assertEquals("Update the ticketListStatusDescription JLabel to " + gui.NO_TICKETS_FOUND,
+        assertEquals("After searching for ID that doesn't exist, update the ticketListStatusDescription JLabel to " + gui.NO_TICKETS_FOUND,
                 gui.NO_TICKETS_FOUND, gui.ticketListStatusDescription.getText());
     
     
+    
+        // Search for ticket id = "", empty string, does not exist in list
+    
+        gui.idSearchTextBox.setText("");
+        gui.searchIdButton.doClick();
+        // List should be empty, invalid message shown
+        assertEquals("After searching for ticket ID \"\" the JList should be empty",
+                0, ticketList.getModel().getSize() );
+        assertEquals("After searching for invalid ID, update the ticketListStatusDescription JLabel to " + gui.NO_TICKETS_FOUND,
+                TicketGUI.INVALID_TICKET_ID, gui.ticketListStatusDescription.getText());
+    
+    
+        // Search for non-numerical ticket id = "pizza", does not exist in list
+    
+        gui.idSearchTextBox.setText("pizza");
+        gui.searchIdButton.doClick();
+        // List should be empty, invalid message shown
+        assertEquals("After searching for ticket ID \"pizza\" the JList should be empty",
+                0, ticketList.getModel().getSize() );
+        assertEquals("After searching for invalid ID, update the ticketListStatusDescription JLabel to " + gui.NO_TICKETS_FOUND,
+                TicketGUI.INVALID_TICKET_ID, gui.ticketListStatusDescription.getText());
+    
+    
+        // Search for negative ticket id = "-2", does not exist in list
+    
+        gui.idSearchTextBox.setText("-2");
+        gui.searchIdButton.doClick();
+        // List should be empty, invalid message shown
+        assertEquals("After searching for ticket ID \"-2\" the JList should be empty",
+                0, ticketList.getModel().getSize() );
+        assertEquals("After searching for invalid ID, update the ticketListStatusDescription JLabel to " + gui.NO_TICKETS_FOUND,
+                TicketGUI.INVALID_TICKET_ID, gui.ticketListStatusDescription.getText());
+    
+    
+        
+        
+    
+        // Click show all
+        
+        gui.showAllTicketsButton.doClick();
+    
+        assertEquals("Update the ticketListStatusDescription JLabel to " + gui.ALL_TICKETS,
+                gui.ALL_TICKETS, gui.ticketListStatusDescription.getText());
+    
+    
+        assertEquals("When show all tickets is clicked, show all tickets in the JList", 2, ticketList.getModel().getSize());
     
     }
     
     
     @Test(timeout=2000)  // Only wait 2 seconds for this test to complete.
     public void testSearchByDescription() throws Exception {
+    
+    
+    
+        TicketStore testTicketStore = new TicketStore();
+    
+        Ticket test1 = new Ticket("Where is my mouse?", 1, "user 1", new Date());
+        Ticket test2 = new Ticket("Server keeps rebooting", 2, "user 1", new Date());
+        Ticket test3 = new Ticket("Mouse mat stolen", 3, "user 2", new Date());
+    
+        testTicketStore.add(test1); testTicketStore.add(test2); testTicketStore.add(test3);
+    
         
+        SupportTicketManagerWithGUI program = new SupportTicketManagerWithGUI();
+    
+        // use test ticket store
+        program.ticketStore = testTicketStore;
+    
+        //bypass the load tickets method
+        program.startGUI();
+    
+    
+        System.out.println("This test uses the following test tickets" + testTicketStore.getAllTickets());
+    
+        fail("TODO FINISH THIS !"); // todo finish
+    
+        TicketGUI gui = program.ticketUI;
+    
+        JList ticketList = gui.ticketList;
+    
+        // Search for ticket text "mouse"
+    
+        gui.descriptionSearchTextBox.setText("mouse");
+    
+        gui.searchIdButton.doClick();
+    
+        // List should show ticket 1 and 3
+    
+        Ticket expected = (Ticket )ticketList.getModel().getElementAt(1);
+    
+        assertTrue("After searching for 'mouse', that matching ticket should be" +
+                " shown in the JList", sameOpenTicket(test1, expected));
+        assertEquals("After searching for ticket ID that exists, only that matching ticket should be" +
+                " shown in the JList", 1, ticketList.getModel().getSize() );
+    
+        // Update search status
+    
+        assertEquals("After ticket found by ID, update the ticketListStatusDescription JLabel", gui.TICKET_MATCHING_ID, gui.ticketListStatusDescription.getText());
+    
+    
+        // Search for ticket 3, should now only show ticket 3 in the list
+    
+        gui.idSearchTextBox.setText("3");
+    
+        gui.searchIdButton.doClick();
+    
+        // List should now only show ticket 3
+    
+        expected = (Ticket )ticketList.getModel().getElementAt(1);
+    
+        assertTrue("After searching for ticket ID that exists, only that matching ticket should be" +
+                " shown in the JList", sameOpenTicket(test3, expected));
+        assertEquals("After searching for ticket ID that exists, only that matching ticket should be" +
+                " shown in the JList", 1, ticketList.getModel().getSize() );
+    
+        assertEquals("After ticket found by ID, update the ticketListStatusDescription JLabel", gui.TICKET_MATCHING_ID, gui.ticketListStatusDescription.getText());
+    
+    
+        // Search for ticket id = 4, does not exist in list
+    
+        gui.idSearchTextBox.setText("4");
+    
+        gui.searchIdButton.doClick();
+    
+        // List should be empty
+    
+        assertEquals("After searching for ticket ID that does not exist, the JList should be empty",
+                0, ticketList.getModel().getSize() );
+    
+        assertEquals("After searching for ID that doesn't exist, update the ticketListStatusDescription JLabel to " + gui.NO_TICKETS_FOUND,
+                gui.NO_TICKETS_FOUND, gui.ticketListStatusDescription.getText());
+    
+    
+    
+        // Search for ticket id = "", empty string, does not exist in list
+    
+        gui.idSearchTextBox.setText("");
+        gui.searchIdButton.doClick();
+        // List should be empty, invalid message shown
+        assertEquals("After searching for ticket ID \"\" the JList should be empty",
+                0, ticketList.getModel().getSize() );
+        assertEquals("After searching for invalid ID, update the ticketListStatusDescription JLabel to " + gui.NO_TICKETS_FOUND,
+                TicketGUI.INVALID_TICKET_ID, gui.ticketListStatusDescription.getText());
+    
+    
+        // Search for non-numerical ticket id = "pizza", does not exist in list
+    
+        gui.idSearchTextBox.setText("pizza");
+        gui.searchIdButton.doClick();
+        // List should be empty, invalid message shown
+        assertEquals("After searching for ticket ID \"pizza\" the JList should be empty",
+                0, ticketList.getModel().getSize() );
+        assertEquals("After searching for invalid ID, update the ticketListStatusDescription JLabel to " + gui.NO_TICKETS_FOUND,
+                TicketGUI.INVALID_TICKET_ID, gui.ticketListStatusDescription.getText());
+    
+    
+        // Search for negative ticket id = "-2", does not exist in list
+    
+        gui.idSearchTextBox.setText("-2");
+        gui.searchIdButton.doClick();
+        // List should be empty, invalid message shown
+        assertEquals("After searching for ticket ID \"-2\" the JList should be empty",
+                0, ticketList.getModel().getSize() );
+        assertEquals("After searching for invalid ID, update the ticketListStatusDescription JLabel to " + gui.NO_TICKETS_FOUND,
+                TicketGUI.INVALID_TICKET_ID, gui.ticketListStatusDescription.getText());
+    
+    
+    
+    
+    
+        // Click show all
+    
+        gui.showAllTicketsButton.doClick();
+    
+        assertEquals("Update the ticketListStatusDescription JLabel to " + gui.ALL_TICKETS,
+                gui.ALL_TICKETS, gui.ticketListStatusDescription.getText());
+    
+    
+        assertEquals("When show all tickets is clicked, show all tickets in the JList", 2, ticketList.getModel().getSize());
+    
+    
+    
+    
     }
     
     

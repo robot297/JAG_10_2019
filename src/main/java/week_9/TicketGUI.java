@@ -46,6 +46,8 @@ public class TicketGUI extends JFrame {
     static final String TICKETS_MATCHING_DESCRIPTION = "Tickets matching search description";
     static final String TICKET_MATCHING_ID = "Ticket matching ID";
     static final String NO_TICKETS_FOUND = "No matching tickets";
+    static final String INVALID_TICKET_ID = "Invalid ticket ID";
+    
     
     
     SupportTicketManagerWithGUI manager;
