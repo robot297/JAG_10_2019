@@ -19,15 +19,21 @@ Configure priorityComboBox so it contains the choices 1, 2, 3, 4, 5.
 
 ### Task 2: Configure TicketGUI ticketList JList
 
-Configure `ticketList` so it will be able to display a list of Ticket objects.
-The selection mode should be `SINGLE_SELECTION`.
+Configure `ticketList` so it will be able to display a list of Ticket objects.  The Ticket objects should be shown in priority order, most urgent first. TicketStore should already be returning Ticket lists in the correct order.
+
+The selection model should be `SINGLE_SELECTION`.
+
+`ticketList` will be able to show any list of Tickets, for example, all the open Tickets, or only Tickets that match a search.
 
 ### Task 3: Get all the open tickets for ticketList JList
 
 Ensure that you have provided the methods to read in open Ticket data from `open_tickets.txt`. 
 
 In TicketGUI, Use the manager object to request all the current open Tickets.
-Configure the ticketList to display this list of open Ticket objects.
+Configure the ticketList to display this list of open Ticket objects when the GUI first opens.
+
+
+Add a listener to `showAllTicketsButton` to show all of the current open tickets in `ticketList`.  The user may click this after searching for tickets. 
  
 ### Task 4: Add Ticket
 
@@ -77,11 +83,14 @@ If a Ticket is selected in `ticketList`, then use TicketGUI's `showInputDialog` 
 
 The user will be able to click the Cancel button, if they don't want to delete/resolve the ticket. You should not delete the selected Ticket. The `ticketList` should not change.
 
-Or, the user will type in a resolution String and click the OK button. Use the String entered to set the resolution of the ticket. Also, set the date it was resolved. Call manager's resolveTicket to remove this Ticket from the ticket store, and add it to the resolved tickets store. 
+Or, the user will type in a resolution String and click the OK button. Do the following tasks:
 
-You'll need to implement TicketProgram's `resolveTicket(Ticket)` method.
-
-The GUI should update `ticketList` so the deleted Ticket is no longer in the list. Display all the remaining open Tickets. `ticketListStatusDescription` should show the String `ALL_TICKETS`. 
+* Use the String entered to set the resolution of the ticket. Also, set the date it was resolved. 
+* Call manager's resolveTicket to remove this Ticket from the ticket store, and add it to the resolved tickets store. 
+* Display an alert dialog with a confirmation message. 
+* You'll need to implement TicketProgram's `resolveTicket(Ticket)` method.
+* The GUI should update `ticketList` so the deleted Ticket is no longer in the list. Display all the remaining open Tickets. 
+* `ticketListStatusDescription` should show the String `ALL_TICKETS`. 
 
 ### Task 8: Save and Quit 
 

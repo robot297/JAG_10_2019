@@ -248,19 +248,16 @@ public class TicketTest {
         //bypass the load tickets method
         program.startGUI();
         
-        // Should be single selection mode
-        
         JList ticketList = program.ticketUI.ticketList;
-        
+    
+        // Should be single selection mode
         int listSelectionMode = ticketList.getSelectionMode();
         
         assertEquals("ticketList should use the single selection mode, to only select on ticket at a time.",
                 listSelectionMode, ListSelectionModel.SINGLE_SELECTION);
         
         // Should be two tickets in list, in the given order (server reboot then mouse mat)
-        
         assertEquals("With a test TicketList of 2 tickets, there should be 2 tickets in your JList", 2, ticketList.getModel().getSize());
-        
         
         try {
             Ticket ticket1 = (Ticket) ticketList.getModel().getElementAt(0);
@@ -322,21 +319,21 @@ public class TicketTest {
         assertEquals("Ticket added to the list should have the same data as that entered into GUI", expected.getPriority(), actualTicket.getPriority());
         assertEquals("Ticket added to the list should have the same data as that entered into GUI", expected.getReporter(), actualTicket.getReporter());
         
-        // Date should be close (within, for example, 4 seconds)
+        // Date should be close (within, for example, 3 seconds)
         
         assertEquals("Ticket added to the list should have the same data as that entered into GUI. " +
-                "The date will not be exactly the same but should be within a few seconds.", expected.getDateReported().getTime(), actualTicket.getDateReported().getTime(), 4000);
+                "The date will not be exactly the same but should be within a few seconds.", expected.getDateReported().getTime(), actualTicket.getDateReported().getTime(), 3000);
     }
     
     
     
-    @Test(timeout=2000)  // Only wait 2 seconds for this test to complete.
+    @Test(timeout=2000)
     public void testSearchById() throws Exception {
     
         TicketStore testTicketStore = new TicketStore();
     
-        Ticket test2 = new Ticket("Server keeps rebooting", 2, "user 1", new Date());  // 2
-        Ticket test3 = new Ticket("Mouse mat stolen", 3, "user 2", new Date());          // 3
+        Ticket test2 = new Ticket("Server keeps rebooting", 2, "user 1", new Date());
+        Ticket test3 = new Ticket("Mouse mat stolen", 3, "user 2", new Date());
     
         testTicketStore.add(test2); testTicketStore.add(test3);
     
@@ -349,13 +346,10 @@ public class TicketTest {
         program.startGUI();
         
         TicketGUI gui = program.ticketUI;
-        
         JList ticketList = gui.ticketList;
         
         // Search for ticket id = 2
-        
         gui.idSearchTextBox.setText("2");
-        
         gui.searchIdButton.doClick();
         
         // List should only show ticket 2
@@ -368,14 +362,12 @@ public class TicketTest {
                 " shown in the JList", 1, ticketList.getModel().getSize() );
     
         // Update search status
-        
         assertEquals("After ticket found by ID, update the ticketListStatusDescription JLabel", TicketGUI.TICKET_MATCHING_ID, gui.ticketListStatusDescription.getText());
         
     
         // Search for ticket 3, should now only show ticket 3 in the list
         
         gui.idSearchTextBox.setText("3");
-    
         gui.searchIdButton.doClick();
     
         // List should now only show ticket 3
@@ -393,7 +385,6 @@ public class TicketTest {
         // Search for ticket id = 4, does not exist in list
     
         gui.idSearchTextBox.setText("4");
-    
         gui.searchIdButton.doClick();
     
         // List should be empty
@@ -438,8 +429,6 @@ public class TicketTest {
         assertEquals("After searching for invalid ID, update the ticketListStatusDescription JLabel to " + TicketGUI.NO_TICKETS_FOUND,
                 TicketGUI.INVALID_TICKET_ID, gui.ticketListStatusDescription.getText());
     
-    
-        
         
     
         // Click show all
@@ -597,13 +586,13 @@ public class TicketTest {
     public void saveAndRestoreTickets() throws Exception {
 
         // Provide dummy return values from any input used
-        // Do not overwrite user's open ticket file
+        // Do not overwrite user's ticket file
         
         TicketProgram.openticketsFile = FileUtils.uniqueFilename("support_ticket_gui");
         
         TicketProgram program = new TicketProgram();
 
-        // Test tickets with all different priorities
+        // Test tickets with  different priorities
         Ticket test1 = new Ticket("Mouse mat stolen", 5, "reporter", new Date());
         Ticket test2 = new Ticket("Word needs updating", 3, "reporter", new Date());
 

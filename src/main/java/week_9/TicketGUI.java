@@ -60,51 +60,12 @@ public class TicketGUI extends JFrame {
         pack();
         setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        
-//        LinkedList<Ticket> allTickets = manager.getAllTickets();
-        
-        // TODO configure components
-        
-        /*
-        * Set up the priorityComboBox to hold numbers 1-5
-        *
-        * Set up the JList to be single selection, and show the all the tickets in allTickets
-         */
-        
-        // TODO configure event handlers
-        
-        /*
-        
-        addButton click event handler to add new Ticket and update list
-        
-        showAllTicketsButton should show all tickets in the ticketList
-        
-        searchDescriptionButton should read the text in descriptionSearchTextBox. Validate that some text is entered.  and
-        ask manager to search for matching tickets. If tickets are found, display them in the allTickets list and update ticketListStatusDescription to say e.g. Tickets matching "powerpoint"
-        If no tickets are found, display a empty list and update the message to say no tickets found.
-        
-        searchIdButton should read the text in idSearchTextBox. Validate that some text is entered, and is an integer.
-        ask manager to search for matching ticket. If ticket is found, display it in the allTickets list and update ticketListStatusDescription to say e.g. Tickets matching "powerpoint"
-        If no ticket is found, display a empty list and update the ticketListStatusDescription text to say no tickets found.
-        
-            
-        saveAndQuitButton should call the quitProgram message in manager
     
     
-        protected JLabel ticketListStatusDescription;
-    
-    
-        deleteSelectedButton, if a ticket is selected in the JList, show a string input to get the resolution.
-        Use confirms, manager should request that ticket is deleted. Update allTickets
-        
-      
-        
-        */
+        // TODO complete the tasks described in grades/Lab 9 Questions.md
+
         
     }
-    
-    
-    
     
     
     
@@ -112,11 +73,15 @@ public class TicketGUI extends JFrame {
         manager.quitProgram();
     }
     
-    //
+    
+    // Use this method to show Alert dialogs. Otherwise tests for
+    // code that shows Alert Dialogs will time out and fail.
     protected void showAlertDialog(String message) {
         JOptionPane.showMessageDialog(this, message);
     }
     
+    // Use this method to show input dialogs. Otherwise tests for
+    // code that shows Alert Dialogs will time out and fail.
     
     // If user cancels, this will return null.
     protected String showInputDialog(String question) {
