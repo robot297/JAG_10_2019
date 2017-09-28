@@ -9,30 +9,35 @@ import java.util.LinkedList;
 public class SupportTicketManagerWithGUI {
     
     
-    private TicketFileIO ticketFileIO;
-    private TicketStore ticketStore;
-    private TicketGUI ticketUI;
+    TicketFileIO ticketFileIO;
+    TicketStore ticketStore;
+    TicketGUI ticketUI;
     
     
-    private String openticketsFile = "opentickets.txt";
+    static String openticketsFile = "opentickets.txt";
     
     
     public static void main(String[] args) {
         new SupportTicketManagerWithGUI().start();
     }
     
-    
     public void start() {
+     //   loadTickets();
+        startGUI();
+    }
+    
+    public void loadTickets() {
         
         TicketFileIO ticketFileIO = new TicketFileIO();
-        
         LinkedList<Ticket> openTickets = ticketFileIO.loadTickets(openticketsFile);
         
         TicketStore ticketStore = new TicketStore();
         ticketStore.addAll(openTickets);
         
+    }
+    
+    public void startGUI() {
         TicketGUI gui = new TicketGUI(this);
-        
     }
     
     

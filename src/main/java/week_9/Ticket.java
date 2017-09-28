@@ -21,6 +21,15 @@ public class Ticket {
     // Either add them to this class or create another class called ResolvedTicket - which
     // do you think is the better approach?
     
+    
+    public Ticket(String desc, int p, String rep, Date date) {
+        this.description = desc;
+        this.priority = p;
+        this.reporter = rep;
+        this.dateReported = date;
+        this.ticketID = ticketIdCounter;
+        ticketIdCounter++;    // Increment ticketIDcounter so the next ticket's number is one higher
+    }
     public void setPriority(int priority) {
         this.priority = priority;
     }
@@ -45,14 +54,7 @@ public class Ticket {
         this.dateReported = dateReported;
     }
     
-    public Ticket(String desc, int p, String rep, Date date) {
-        this.description = desc;
-        this.priority = p;
-        this.reporter = rep;
-        this.dateReported = date;
-        this.ticketID = ticketIdCounter;
-        ticketIdCounter++;    // Increment ticketIDcounter so the next ticket's number is one higher
-    }
+   
 
     protected int getPriority() {
         return priority;

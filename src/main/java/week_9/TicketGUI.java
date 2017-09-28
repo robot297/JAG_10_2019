@@ -1,31 +1,56 @@
 package week_9;
 
+import com.sun.codemodel.internal.JOp;
+
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.LinkedList;
 
 public class TicketGUI extends JFrame {
     
     
-    private JPanel mainPanel;
-    private JPanel addTicketPanel;
-    private JPanel ticketListPanel;
-    private JPanel searchPanel;
-    private JPanel controlsPanel;
-    private JTextField reporterTextField;
-    private JComboBox priorityComboBox;
-    private JButton addButton;
-    private JList ticketList;
-    private JTextField descriptionSearchTextBox;
-    private JTextField idSearchTextBox;
-    private JButton saveAndQuitButton;
-    private JTextField descriptionTextField;
-    private JButton searchDescriptionButton;
-    private JButton searchIdButton;
-    private JLabel ticketListStatusDescription;
-    private JButton showAllTicketsButton;
-    private JButton deleteSelectedButton;
+    protected JPanel mainPanel;
+    
+    
+    // Components for adding tickets
+    protected JPanel addTicketPanel;
+    protected JTextField descriptionTextField;
+    protected JTextField reporterTextField;
+    protected JComboBox priorityComboBox;
+    protected JButton addButton;
+    
+    // Components for displaying ticket list
+    protected JPanel ticketListPanel;
+    protected JList ticketList;
+    protected JLabel ticketListStatusDescription;
+    
+    // Components for searching
+    protected JPanel searchPanel;
+    protected JTextField descriptionSearchTextBox;
+    protected JTextField idSearchTextBox;
+    protected JButton searchDescriptionButton;
+    protected JButton searchIdButton;
+    protected JButton showAllTicketsButton;
+    
+    // Saving and quit
+    protected JPanel controlsPanel;
+    protected JButton saveAndQuitButton;
+    
+    // Deleting
+    protected JButton deleteSelectedButton;
+    
+    
+    // Messages for showing in ticketListStatusDescription
+    static final String ALL_TICKETS = "showing all tickets";
+    static final String TICKETS_MATCHING_DESCRIPTION = "Tickets matching search description";
+    static final String TICKET_MATCHING_ID = "Ticket matching ID";
+    static final String NO_TICKETS_FOUND = "No matching tickets";
+    
     
     SupportTicketManagerWithGUI manager;
+    
+    // Messages to show in
     
     TicketGUI(SupportTicketManagerWithGUI manager) {
         
@@ -36,7 +61,7 @@ public class TicketGUI extends JFrame {
         setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         
-        LinkedList<Ticket> allTickets = manager.getAllTickets();
+//        LinkedList<Ticket> allTickets = manager.getAllTickets();
         
         // TODO configure components
         
@@ -66,7 +91,7 @@ public class TicketGUI extends JFrame {
         saveAndQuitButton should call the quitProgram message in manager
     
     
-        private JLabel ticketListStatusDescription;
+        protected JLabel ticketListStatusDescription;
     
     
         deleteSelectedButton, if a ticket is selected in the JList, show a string input to get the resolution.
@@ -128,4 +153,18 @@ public class TicketGUI extends JFrame {
         //TODO Problem 6 use your new TicketFileIO class to save all open tickets to a file; save all resolved tickets to a separate file
     }
     
+    //
+    protected void showAlertDialog(String message) {
+        JOptionPane.showMessageDialog(this, message);
+    }
+    
+    
+    // If user cancels, this will return null.
+    protected String showUserInputDialog(String question) {
+        return JOptionPane.showInputDialog(this, question);
+    }
+    
+    
 }
+
+
