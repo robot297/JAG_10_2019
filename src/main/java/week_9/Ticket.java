@@ -15,7 +15,7 @@ public class Ticket {
     private static int ticketIdCounter = 1;
     
     //The ID for each ticket - an instance variable. Each Ticket will have it's own ticketID variable
-    protected int ticketID;
+    private int ticketID;
     
     // You should have already done these tasks in the previous lab
     // TODO: tickets need to store the resolution date and a string describing the resolution

@@ -12,7 +12,8 @@ public class TicketProgram {
     TicketGUI ticketUI;
     
     
-    static String openticketsFile = "opentickets.txt";
+    static String openTicketsFile = "opentickets.txt";
+    static String resolvedTicketsFilePrefix = "Resolved_Tickets_"; // for making a filename like  "Resolved_Tickets_September_28_2017.txt"
     
     
     public static void main(String[] args) {
@@ -20,20 +21,31 @@ public class TicketProgram {
     }
     
     public void start() {
-        loadTickets();  // TODO uncomment before publishing
+        loadTickets();
+        configureTicketIdGeneration();
         startGUI();
     }
     
+    
     public void loadTickets() {
     
-        System.out.println("*******************DO NOT CALL THIS IN TESTS *************");
+        System.out.println("*******************DO NOT CALL THIS METHOD IN UI TESTS *************");
         TicketFileIO ticketFileIO = new TicketFileIO();
-        LinkedList<Ticket> openTickets = ticketFileIO.loadTickets(openticketsFile);
+        LinkedList<Ticket> openTickets = ticketFileIO.loadTickets(openTicketsFile);
         
         TicketStore ticketStore = new TicketStore();
         ticketStore.addAll(openTickets);
         
     }
+    
+    
+    private void configureTicketIdGeneration() {
+        
+        // TODO 7 If you need to do anything to assist generating unqiue ticket IDs, do it here.
+    
+    }
+    
+    
     
     public void startGUI() {
         ticketUI = new TicketGUI(this);
@@ -78,6 +90,10 @@ public class TicketProgram {
         
         // TODO task 8
         
+        // Use the static String resolvedTicketsFilePrefix = "Resolved_Tickets_";
+        // for making a filename like  "Resolved_Tickets_September_28_2017.txt"
+    
+    
     }
     
     

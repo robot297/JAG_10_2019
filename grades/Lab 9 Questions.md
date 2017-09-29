@@ -108,4 +108,10 @@ You should be able to use the same code written in the previous version of this 
 
 You don't need to read in the previous resolved tickets. 
 
+As before, what happens to ticket IDs when the program is closed and opened? Make sure they don't reset to 1 when the user restarts the program. Every ticket created should always have a unique positive integer ID, (excluding 0) no matter how many times the program is used*. 
+
+You will need to create a second constructor for creating a tickets when the ID is already known. Make sure you don't break your mechanism for ensuring unique IDs. 
+
+*Actually, you'll only be able to create approx 2 billion ticket IDs with this approach. That should be enough for now, although perhaps something to revisit in a future version.
+
 Ensure that you include your mechanism for generating unique positive integer IDs for your Ticket objects. 
