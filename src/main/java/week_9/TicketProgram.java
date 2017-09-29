@@ -9,7 +9,8 @@ public class TicketProgram {
     
     TicketFileIO ticketFileIO;
     TicketStore ticketStore;
-    TicketGUI ticketUI;
+    TicketGUI ticketGUI;
+    ResolvedTicketStore resolvedTicketStore;
     
     
     static String openTicketsFile = "opentickets.txt";
@@ -17,38 +18,57 @@ public class TicketProgram {
     
     
     public static void main(String[] args) {
-        new TicketProgram().start();
+        TicketProgram ticketProgram = new TicketProgram();
+        
+        ticketProgram.setup(null);
+        ticketProgram.startGUI();
+        
     }
     
-    public void start() {
-        loadTickets();
+    
+    protected void setup(LinkedList<Ticket> injectedTestData) {
+        createTicketStore();
+        loadTicketsToTicketStore(injectedTestData);
+        configureResolvedTickets();
         configureTicketIdGeneration();
         startGUI();
     }
     
-    
-    public void loadTickets() {
-    
-        System.out.println("*******************DO NOT CALL THIS METHOD IN UI TESTS *************");
-        TicketFileIO ticketFileIO = new TicketFileIO();
-        LinkedList<Ticket> openTickets = ticketFileIO.loadTickets(openTicketsFile);
-        
-        TicketStore ticketStore = new TicketStore();
-        ticketStore.addAll(openTickets);
-        
+    // Do any TicketStore setup here
+    protected void createTicketStore() {
+        ticketStore = new TicketStore();
     }
     
     
-    private void configureTicketIdGeneration() {
-        
-        // TODO 7 If you need to do anything to assist generating unqiue ticket IDs, do it here.
+    protected void loadTicketsToTicketStore(LinkedList<Ticket> injectedTestData) {
     
+        ticketFileIO = new TicketFileIO();
+    
+        if (injectedTestData != null) {
+            ticketStore.addAll(injectedTestData);
+        }
+        
+        else {
+            LinkedList<Ticket> openTickets = ticketFileIO.loadTickets(openTicketsFile);
+            ticketStore.addAll(openTickets);
+        }
+    }
+    
+    
+    // Do any setup for your resolved tickets store here.
+    protected void configureResolvedTickets() {
+        resolvedTicketStore = new ResolvedTicketStore();
+    }
+    
+    
+    protected void configureTicketIdGeneration() {
+        // TODO 7 If you need to do anything to assist generating unique ticket IDs, do it here.
     }
     
     
     
-    public void startGUI() {
-        ticketUI = new TicketGUI(this);
+    protected void startGUI() {
+        ticketGUI = new TicketGUI(this);
     }
     
     

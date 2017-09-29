@@ -11,6 +11,9 @@ Tickets need to store the priority, a description of the Task, the person who re
 
 When a Task is fixed, the ticket is deleted and the reason for deleting the tickt is recorded. 
 
+Your Ticket objects should be able to store another date; `resolvedDate`, the date the ticket was closed.
+And, a String that documents why the ticket was closed – the fix or the resolution for the ticket. This String should be called `resolution`
+
 For this Task, you will implement a GUI for the program. 
 
 ### Task 1: TicketGUI, Set up priorityComboBox

@@ -6,7 +6,8 @@ import org.junit.Test;
 import test_utils.FileUtils;
 
 import javax.swing.*;
-import java.lang.reflect.Field;
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static org.junit.Assert.*;
@@ -198,18 +199,35 @@ public class TicketTest {
     
     
     /* *************** Test TicketUI Methods **********************/
-
-    // TASK 1 Configure Combobox
+    
+    
+    // Some example test data, used throughout many test methods
+    
+    private LinkedList<Ticket> generateTestTickets() {
+        
+        Ticket test1 = new Ticket("Server keeps rebooting", 1, "user 1", new Date());  // add in order so id = 1
+        Ticket test2 = new Ticket("Mouse stolen", 5, "user 2", new Date());     // ID = 2
+        Ticket test3 = new Ticket("Mouse mat stolen", 3, "user 2", new Date());    // ID = 3
+        
+        LinkedList<Ticket> tickets = new LinkedList<>();
+        tickets.add(test1);
+        tickets.add(test2);
+        tickets.add(test3);
+        
+        return tickets;
+    }
+    
+    
+    // TASK 1 Configure ComboBox
 
     @Test(timeout=2000)  // Only wait 2 seconds for this test to complete.
     public void testPriorityComboBoxConfigured() throws Exception {
-    
-        // empty ticket list
-
+        
         TicketProgram program = new TicketProgram();
+        program.setup(null);   // don't need test tickets
         program.startGUI();
         
-        JComboBox priorityCombo = program.ticketUI.priorityComboBox;
+        JComboBox priorityCombo = program.ticketGUI.priorityComboBox;
 
         //priorityComboBox should have 1-5 in
         
@@ -233,11 +251,10 @@ public class TicketTest {
         // Model uses Ticket objects
         
         TicketProgram program = new TicketProgram();
-        
-        //bypass the load tickets method
+        program.setup(null);
         program.startGUI();
         
-        JList ticketList = program.ticketUI.ticketList;
+        JList ticketList = program.ticketGUI.ticketList;
                 
         try {
             DefaultListModel model = (DefaultListModel) ticketList.getModel();
@@ -257,40 +274,39 @@ public class TicketTest {
     
     @Test(timeout=2000)
     public void testTicketListGetAllData() throws Exception {
+       
         // shows example ticket list in correct order
         
-        TicketStore testTicketStore = new TicketStore();
+        /*
+        *   Ticket test1 = new Ticket("Server keeps rebooting", 1, "user 1", new Date());   // id 1
+        Ticket test3 = new Ticket("Mouse mat stolen", 3, "user 2", new Date());        // id 3
+        Ticket test2 = new Ticket("Mouse stolen", 5, "user 2", new Date());          // id 2
         
-        Ticket test1 = new Ticket("Server keeps rebooting", 2, "user 1", new Date());
-        Ticket test2 = new Ticket("Mouse mat stolen", 3, "user 2", new Date());
+        */
         
-        testTicketStore.add(test1); testTicketStore.add(test2);
-        
+        LinkedList<Ticket> testTickets = generateTestTickets();
         TicketProgram program = new TicketProgram();
-        
-        // use test ticket store
-        program.ticketStore = testTicketStore;
-        
-        //bypass the load tickets method
+        program.setup(testTickets);
         program.startGUI();
         
-        JList ticketList = program.ticketUI.ticketList;
+        JList ticketList = program.ticketGUI.ticketList;
         
-        // Should be two tickets in list, in the given order (server reboot then mouse mat)
-        assertEquals("With a test TicketList of 2 tickets, there should be 2 tickets in your JList", 2, ticketList.getModel().getSize());
+        // Should be three tickets in list, in the given order
+        assertEquals("With a test TicketList of 3 tickets, there should be 3 tickets in your JList. Test list is " + testTickets,
+                3, ticketList.getModel().getSize());
         
         try {
-            Ticket ticket1 = (Ticket) ticketList.getModel().getElementAt(0);
-            Ticket ticket2 = (Ticket) ticketList.getModel().getElementAt(1);
-            
-            String msg = String.format("Using a test ticket list of \n%s, \n%s. \n\nYour JList should show these tickets in this order. \nFound \n%s \n%s",
-                    test1, test2, ticket1, ticket2);
-            
-            assertTrue(msg, sameOpenTicket(ticket1, test1));
-            assertTrue(msg, sameOpenTicket(ticket2, test2));
+            Ticket ticket_id1 = (Ticket) ticketList.getModel().getElementAt(0);
+            Ticket ticket_id3 = (Ticket) ticketList.getModel().getElementAt(1);
+            Ticket ticket_id2 = (Ticket) ticketList.getModel().getElementAt(2);
+    
+            String msg = "The JList should show all open tickets.";
+            assertTrue(msg, sameOpenTicket(ticket_id1, testTickets.get(0)));
+            assertTrue(msg, sameOpenTicket(ticket_id3, testTickets.get(1)));
+            assertTrue(msg, sameOpenTicket(ticket_id2, testTickets.get(2)));
             
         } catch (ClassCastException cce) {
-            fail("Your JList should be a list of Ticket objects");
+            fail("Your JList models should contain only Ticket objects. Use generic types");
         }
     }
     
@@ -305,8 +321,10 @@ public class TicketTest {
         String msg = "Ticket added to the list should have the same data as that entered into GUI. " +
                 "The date need not be exactly the same but it must be close.";
         
-        
-        TicketGUI gui = createGUIWithEmptyTicketStore();
+        TicketProgram program = new TicketProgram();
+        program.setup(new LinkedList<Ticket>());   // force program to start with empty ticket list
+        program.startGUI();
+        TicketGUI gui = program.ticketGUI;
         
         // Example data for ticket
         String description = "Server needs updating", reporter = "User";
@@ -368,10 +386,13 @@ public class TicketTest {
     
     @Test(timeout=2000)
     public void testAddTicketAlreadyPopulatedListValidData() throws Exception {
+    
+        TicketProgram program = new TicketProgram();
+        program.setup(generateTestTickets());
+        program.startGUI();
+        TicketGUI gui = program.ticketGUI;
         
-       TicketGUI gui = createGUIWithTestData();
-        
-        int originalSize = gui.manager.getAllTickets().size();
+        int originalSize = program.getAllTickets().size();
         
         // Example data for new ticket
         String description = "Server needs updating", reporter = "User";
@@ -387,7 +408,7 @@ public class TicketTest {
         // click add button
         gui.addButton.doClick();
     
-        // Now ticket should be the first and only element in JList
+        // New ticket added to list at position 2
         assertEquals("After adding 1 ticket to a list with 3 tickets in, there should be 4 tickets in the JList",
                 4, gui.ticketList.getModel().getSize());
     
@@ -397,30 +418,34 @@ public class TicketTest {
         System.out.println("Expected ticket =" + expected);
         System.out.println("Actual ticket created by the program =" + actualTicket);
     
-        assertTrue("A new ticket with priority 4 to the test list should be added at position 2", sameOpenTicket(actualTicket, expected, 4000));
-        assertEquals("A new ticket should be added to the data store.", originalSize + 1, gui.manager.getAllTickets().size());
+        assertTrue("A new ticket with priority 4 to the test list should be added at position 2", sameOpenTicket(actualTicket, expected, 2000));
+        assertEquals("A new ticket should be added to the data store.", originalSize + 1, program.getAllTickets().size());
+        
     }
     
     // TASK 4 Add Ticket
     
     @Test(timeout=2000)
     public void testAddTicketInvalidData() throws Exception {
-        
-        TicketGUIMockDialog gui = createGUIWithEmptyTicketStore();
-        
-        // Example invalid data for new ticket
-        invalidAddTicket(gui, "", "", null);
-        invalidAddTicket(gui, "Mouse mat", "", null);
-        invalidAddTicket(gui, "", "The User", null);
-        invalidAddTicket(gui, "", "", 3);
-        invalidAddTicket(gui, "Mouse mat", "User", null);
-        invalidAddTicket(gui, "", "User", 2);
-        invalidAddTicket(gui, "Mpuse", "", 3);
+    
+        TicketProgram program = new TicketProgram();
+        program.setup(new LinkedList<>());   // force program to start with empty ticket list
+        TicketGUIMockDialog gui = new TicketGUIMockDialog(program);  // Replace GUI with mock dialog version
+        program.ticketGUI = gui;
+    
+        // Example invalid data for new ticket. Asserts in assertFailAddInvalidTicket
+        assertFailAddInvalidTicket(gui, "", "", null);
+        assertFailAddInvalidTicket(gui, "Mouse mat", "", null);
+        assertFailAddInvalidTicket(gui, "", "The User", null);
+        assertFailAddInvalidTicket(gui, "", "", 3);
+        assertFailAddInvalidTicket(gui, "Mouse mat", "User", null);
+        assertFailAddInvalidTicket(gui, "", "User", 2);
+        assertFailAddInvalidTicket(gui, "Mouse", "", 3);
     
     }
 
     
-    private void invalidAddTicket(TicketGUIMockDialog gui, String description, String reporter, Integer comboboxSelection) {
+    private void assertFailAddInvalidTicket(TicketGUIMockDialog gui, String description, String reporter, Integer comboboxSelection) {
         // enter data - no selection for priority
         gui.descriptionTextField.setText(description);
         gui.reporterTextField.setText(reporter);
@@ -458,7 +483,7 @@ public class TicketTest {
         program.ticketStore = testTicketStore;  // use test ticket store
         program.startGUI();  // bypass load from file
         
-        TicketGUI gui = program.ticketUI;
+        TicketGUI gui = program.ticketGUI;
         JList ticketList = gui.ticketList;
         
         // Search for ticket id = 2
@@ -563,7 +588,7 @@ public class TicketTest {
         
         System.out.println("This test uses the following test tickets" + testTicketStore.getAllTickets());
         
-        TicketGUI gui = program.ticketUI;
+        TicketGUI gui = program.ticketGUI;
     
         JList ticketList = gui.ticketList;
     
@@ -643,32 +668,427 @@ public class TicketTest {
     
     // TASK 7 Delete selected
     
-    @Test(timeout=2000)  // Only wait 2 seconds for this test to complete.
-    public void testDeleteSelected()  {
-       
-        TicketGUIMockDialog gui = createGUIWithTestData();
+    @Test(timeout=2000)
+    public void testDeleteSelectedButNoneSelected() {
         
-        // delete ticket 2
+        TicketProgram program = new TicketProgram();
+        program.setup(generateTestTickets());
+        TicketGUIMockDialog gui = new TicketGUIMockDialog(program);
+        program.ticketGUI = gui;
         
-        gui.ticketList.setSelectedIndex(2);
-        
-        // expect input dialog after this line, so set it up first
-        
-        String userInput = "User fixed their screensaver";
-        gui.mockUserInput = userInput;
-        
+        gui.ticketList.clearSelection();   // Unselect everything
         gui.deleteSelectedButton.doClick();
         
+        // expect an alert dialog to be shown
+        assertTrue("Show an alert dialog if the user clicks the delete selected " +
+                "button without anything selected in the ticketList ", gui.wasAlertCalled);
+        
+    }
+    
+    // TASK 7 Delete selected, user cancel
+    
+    @Test(timeout=2000)
+    public void testDeleteSelectedUserCancel() {
+    
+        TicketProgram program = new TicketProgram();
+        program.setup(generateTestTickets());
+        TicketGUIMockDialog gui = new TicketGUIMockDialog(program);
+        program.ticketGUI = gui;
+    
+        DefaultListModel<Ticket> model = (DefaultListModel<Ticket>) gui.ticketList.getModel();
+    
+        Ticket test3_fromStore = program.searchById(3);
+        
+        // delete ticket ID 3, expected to be at position 1
+        gui.ticketList.setSelectedIndex(1);
+        
+        Ticket test3_model = gui.ticketList.getModel().getElementAt(1);
+        
+        // It's the same ticket?
+        
+        assertTrue("Tickets in TicketList should be in the same order as ticket store", sameOpenTicket(test3_fromStore, test3_model));
+        
+        // Changed mind. Click cancel.
+    
+        // expect input dialog after clicking the deleteSelected button, so set it up first
+    
+        // If user clicks cancel the Input dialog returns null
+        gui.mockUserInput = null;
+    
+        gui.deleteSelectedButton.doClick();
+        // should have an input dialog shown and returning the value given
+        
+        // The GUI should NOT remove the ticket from the list
+        assertEquals("If user cancels, there should still be three tickets in the list", 3, model.getSize());
+    
+        assertEquals("The first ticket should be ID 1", 1, model.get(0).getTicketID());
+        assertEquals("The second ticket should be ID 3", 3, model.get(1).getTicketID());
+        assertEquals("The third ticket should be ID 2", 2, model.get(2).getTicketID());
+    
+        // An alert dialog should NOT been shown
+        assertFalse("Do not delete or show a delete confirmation alert dialog when delete was cancelled", gui.checkAlertWasCalled());
+        
+        // On the back end, resolved tickets should NOT contain this ticket
+        LinkedList<Ticket> resolved = program.resolvedTicketStore.getAll();
+        assertEquals("No if delete operation cancelled, should be no tickets in the resolved ticket store", 0, resolved.size());
+        
+        // The ticket should NOT be resolved
+        
+        assertNull("If ticket delete cancelled, ticket should not be resolved", test3_model.getResolution());
+        assertNull("If ticket delete cancelled, ticket should not be resolved", test3_model.getDateResolved());
+        
+        // And open tickets should still contain this ticket;
+        String msg = "Delete the deleted ticket from the ticket store";
+        assertNotNull(msg, program.searchById(1));
+        assertNotNull(msg, program.searchById(2));
+        assertNotNull(msg, program.searchById(3));
+        assertEquals(msg, 3, program.getAllTickets().size());
+        
+    }
+        
+        // TASK 7 Delete selected
+    
+    @Test(timeout=2000)
+    public void testDeleteSelected()  {
+    
+        TicketStore testTicketStore = new TicketStore();
+        
+        Ticket test1 = new Ticket("Server keeps rebooting", 1, "user 1", new Date());  // ID 1
+        Ticket test3 = new Ticket("Mouse mat stolen", 3, "user 2", new Date());        // ID 3
+        Ticket test2 = new Ticket("Mouse stolen", 5, "user 2", new Date());            // ID 2
+    
+        testTicketStore.add(test1); testTicketStore.add(test2); testTicketStore.add(test3);
+    
+        TicketProgram program = new TicketProgram();
+    
+        program.configureResolvedTickets();
+    
+        program.ticketStore = testTicketStore;     // use test ticket store
+    
+        TicketGUIMockDialog gui = new TicketGUIMockDialog(program);
+    
+        program.ticketGUI = gui;
+        program.startGUI();
+        
+        DefaultListModel<Ticket> model = (DefaultListModel<Ticket>) gui.ticketList.getModel();
+        
+        // delete ticket ID 3, at position 1
+        gui.ticketList.setSelectedIndex(1);
+        
+        // expect input dialog after clicking the deleteSelected button, so set it up first
+        
+        String expectedUserInput = "Replaced mouse mat";   // This should end up as resolution field in Ticket
+        gui.mockUserInput = expectedUserInput;
+        
+        Date expectedResolvedDate = new Date();
+        gui.deleteSelectedButton.doClick();
         // should have an input dialog shown and returning the value given
         
         
+        // The GUI should remove the ticket from the list
+        assertEquals("After deleting one ticket from the list, there should be two remaining", 2, model.getSize());
         
+        assertEquals("The first remaining ticket should be ID 1", 1, model.get(0).getTicketID());
+        assertEquals("The second remaining ticket should be ID 3", 3, model.get(1).getTicketID());
+    
+    
+        // An alert dialog should have been shown
+        assertTrue("Show a confirmation alert dialog when ticket has been deleted", gui.checkAlertWasCalled());
+    
+    
+        // On the back end, resolved tickets should contain this ticket
+        LinkedList<Ticket> resolved = program.resolvedTicketStore.getAll();
+        assertEquals("The deleted ticket should be in the resolved ticket store", 1, resolved.size());
+        Ticket resolvedTicket = resolved.get(0);
+    
+        assertTrue("The deleted ticket should be in the resolved ticket store", sameOpenTicket(resolvedTicket, test3));
+        assertEquals("The deleted ticket should save the resolution entered by the user", expectedUserInput, resolvedTicket.getResolution());
+        assertEquals("The deleted ticket should save the resolution date, the date/time the ticket was resolved",
+                expectedResolvedDate.getTime(), resolvedTicket.getDateResolved().getTime(), 3000);
+        
+        // And open tickets should not contain this ticket; just ID 1 and 2
+        String msg = "Delete the deleted ticket from the ticket store";
+        assertNotNull(msg, program.searchById(1));
+        assertNotNull(msg, program.searchById(2));
+        assertNull(msg, program.searchById(3));
+        assertEquals(msg, 2, program.getAllTickets().size());
+        
+        
+        // Delete ID 1
+    
+    
+        // delete ticket ID 1, at position 0
+        gui.ticketList.setSelectedIndex(0);
+    
+        // expect input dialog after clicking the deleteSelected button, so set it up first
+    
+        expectedUserInput = "Replaced mouse and glued new mouse to table.";   // This should end up as resolution field in Ticket
+        gui.mockUserInput = expectedUserInput;
+        
+        expectedResolvedDate = new Date();
+        gui.deleteSelectedButton.doClick();
+        
+        // should have an input dialog shown and returning the value given
+    
+        // The GUI should remove the ticket from the list
+    
+        assertEquals("After deleting another ticket from the list, there should be one remaining", 1, model.getSize());
+    
+        assertEquals("The remaining ticket should be ID 2", 2, model.get(0).getTicketID());
+        
+        // An alert dialog should have been shown
+        assertTrue("Show a confirmation alert dialog when ticket has been deleted", gui.checkAlertWasCalled());
+    
+        // On the back end, resolved tickets should contain this ticket
+        resolved = program.resolvedTicketStore.getAll();
+        assertEquals("The deleted ticket should be the last ticket in the resolved ticket store", 2, resolved.size());
+        resolvedTicket = resolved.get(1);
+    
+        assertTrue("The deleted ticket should be in the resolved ticket store", sameOpenTicket(resolvedTicket, test3));
+        assertEquals("The deleted ticket should save the resolution entered by the user", expectedUserInput, resolvedTicket.getResolution());
+        assertEquals("The deleted ticket should save the resolution date, the date/time the ticket was resolved",
+                expectedResolvedDate.getTime(), resolvedTicket.getDateResolved().getTime(), 3000);
+    
+        // And open tickets should not contain this ticket; just ID 2
+        assertNull(msg, program.searchById(1));
+        assertNotNull(msg, program.searchById(2));
+        assertNull(msg, program.searchById(3));
+        assertEquals(msg, 1, program.getAllTickets().size());
+        
+        
+        
+        // Delete last ticket
+    
+        // delete ticket ID 1, at position 0
+        gui.ticketList.setSelectedIndex(0);
+    
+        // expect input dialog after clicking the deleteSelected button, so set it up first
+    
+        expectedUserInput = "Rebooted the server by accidentally tripping over the power cable and pulling it out.";   // This should end up as resolution field in Ticket
+        gui.mockUserInput = expectedUserInput;
+    
+        expectedResolvedDate = new Date();
+        gui.deleteSelectedButton.doClick();
+        // should have an input dialog shown and returning the value given
+    
+        // The GUI should remove the ticket from the list
+        assertEquals("After deleting another ticket from the list, there should be none remaining", 0, model.getSize());
+        
+        // An alert dialog should have been shown
+        assertTrue("Show a confirmation alert dialog when ticket has been deleted", gui.checkAlertWasCalled());
         
         // On the back end, resolved tickets should contain this ticket
+        resolved = program.resolvedTicketStore.getAll();
+        assertEquals("The deleted ticket should be the last ticket in the resolved ticket store", 3, resolved.size());
+        resolvedTicket = resolved.get(2);
+    
+        assertTrue("The deleted ticket should be in the resolved ticket store", sameOpenTicket(resolvedTicket, test3));
+        assertEquals("The deleted ticket should save the resolution entered by the user", expectedUserInput, resolvedTicket.getResolution());
+        assertEquals("The deleted ticket should save the resolution date, the date/time the ticket was resolved",
+                expectedResolvedDate.getTime(), resolvedTicket.getDateResolved().getTime(), 3000);
+    
+        // And open tickets should not contain any tickets
+        assertEquals(msg, 0, program.getAllTickets().size());
+        
+    
     }
     
     
-    class TicketGUIMockDialog extends TicketGUI {
+    /// TASK 8 Save and Quit, tickets to file
+    
+    @Test(timeout=3000)
+    public void saveAndRestoreTickets() throws Exception {
+        
+        LinkedList<Ticket> originalTickets = generateTestTickets();
+        
+        TicketProgram program = new TicketProgram();
+        program.setup(originalTickets);
+        program.startGUI();
+        
+        String openTicketFile = FileUtils.uniqueFilename("open_tickets");  // adds on some unique characters to avoid overwriting student file
+        testFileNames.add(openTicketFile);   // add to list that will be moved to test file directory after test
+        TicketProgram.openTicketsFile = openTicketFile;
+        
+        program.ticketGUI.saveAndQuitButton.doClick();   // This should invoke the save and quit method for the test Tickets.
+        
+        // Now restart program
+        
+        TicketProgram relaunchedProgram = new TicketProgram();
+        program.setup(null);   // program loads normally
+        program.startGUI();
+    
+        // The tickets should have been read from a file, and be available.
+        
+        LinkedList<Ticket> ticketList_relaunch = relaunchedProgram.getAllTickets();
+        
+        assertEquals("There should be the same number of open tickets after your app is restarted. " +
+                        "Save all open tickets to a file when app closes, read the tickets from the file when it restarts.",
+                ticketList_relaunch.size(), originalTickets.size());
+        
+        // Same tickets? Should be in the same priority order
+        
+        for (int t = 0 ;  t < ticketList_relaunch.size() ; t++) {
+            String msg = "Read all data from the file to create a new ticket list.  " +
+                    "Wrote out \n%s\n and got \n%s\n back. Make sure all the data is the same as the original ticket.";
+            Ticket expected = originalTickets.get(t);
+            Ticket actual = ticketList_relaunch.get(t);
+            
+            assertTrue(String.format(msg, expected, actual), sameOpenTicket(expected, actual));
+        }
+        
+        
+    }
+    
+    
+    // TASK 9 Save resolved tickets
+    
+    @Test(timeout=3000)
+    public void saveResolvedTicketsAppendSameDay() throws Exception {
+    
+    
+        LinkedList<Ticket> originalTickets = generateTestTickets();
+        
+        String[] resolutions = {
+                "Turned it off and back on again",
+                "Bribed user to keep quiet with donuts",
+                "Glued mouse mat to desk"
+        };
+    
+        TicketProgram program = new TicketProgram();
+        program.setup(originalTickets);
+        TicketGUIMockDialog gui = new TicketGUIMockDialog(program);
+        program.ticketGUI = gui;
+        
+        String resolvedTicketFilePrefix = FileUtils.uniqueFilename("test_resolved_tickets");
+        TicketProgram.resolvedTicketsFilePrefix = resolvedTicketFilePrefix;
+        
+        // Expected filename: resolvedTicketFile_September_08_2017.txt
+        SimpleDateFormat format = new SimpleDateFormat("MMMM_dd_yyyy");
+        Date date = new Date();
+        String today = format.format(date);
+        
+        String expectedFileName = resolvedTicketFilePrefix + today + ".txt";
+        testFileNames.add(expectedFileName);
+        
+        // resolve first two tickets
+        gui.mockUserInput = resolutions[0];
+        gui.ticketList.setSelectedIndex(0);
+        gui.deleteSelectedButton.doClick();
+        gui.mockUserInput = resolutions[1];
+        gui.ticketList.setSelectedIndex(0);
+        gui.deleteSelectedButton.doClick();
+        
+        gui.saveAndQuitButton.doClick();   // This should invoke the save and quit method for the test Tickets.
+        
+        // Something in the file?
+        
+        File f = new File(expectedFileName);
+        
+        assertTrue(f.exists());
+        
+        long fileSize = f.length();
+        
+        assertTrue(fileSize > 0);
+        
+        assertTrue("The resolved ticket should be written to a file", FileUtils.fileContainsText(f, resolutions[0]));
+        assertTrue("The resolved ticket should be written to a file", FileUtils.fileContainsText(f, resolutions[1]));
+        
+        // Relaunch
+        
+        // Resolve last ticket
+    
+        program = new TicketProgram();
+        program.setup(null);  // let it read from file
+        gui = new TicketGUIMockDialog(program);
+        program.ticketGUI = gui;
+    
+        TicketProgram.resolvedTicketsFilePrefix = resolvedTicketFilePrefix;
+    
+        // resolve first two tickets
+        gui.mockUserInput = resolutions[2];
+        gui.ticketList.setSelectedIndex(0);
+        gui.deleteSelectedButton.doClick();
+    
+        gui.saveAndQuitButton.doClick();
+        
+        f = new File(expectedFileName);
+    
+        assertTrue(f.exists());
+    
+        long newFileSize = f.length();
+    
+        assertTrue(newFileSize > 0);
+        
+        assertTrue("The resolved ticket should be written to a file", FileUtils.fileContainsText(f, resolutions[0]));
+        assertTrue("The resolved ticket should be written to a file", FileUtils.fileContainsText(f, resolutions[1]));
+        assertTrue("The resolved ticket should be written to a file", FileUtils.fileContainsText(f, resolutions[2]));
+    
+    
+    
+    
+    
+    }
+    
+    
+    @Test(timeout=3000)
+    public void testRestoreTicketsNewTicketsUniqueID() throws Exception {
+        
+        String openTicketFile = FileUtils.uniqueFilename("support_ticket_gui");
+        testFileNames.add(openTicketFile);
+        TicketProgram.openTicketsFile = openTicketFile;
+    
+        LinkedList<Ticket> originalTickets = generateTestTickets();
+    
+        TicketProgram program = new TicketProgram();
+        
+        program.setup(originalTickets);
+        TicketGUIMockDialog gui = new TicketGUIMockDialog(program);
+        program.ticketGUI = gui;
+        
+    
+        gui.saveAndQuitButton.doClick();   // This should invoke the save and quit method for the test Tickets.
+        
+        TicketProgram relaunchedProgram = new TicketProgram();
+        relaunchedProgram.setup(null);
+        relaunchedProgram.startGUI();
+        
+        // The tickets should have been read from a file, and be available.
+        
+        TicketGUI relaunchedGUI = relaunchedProgram.ticketGUI;
+        
+        relaunchedGUI.descriptionTextField.setText("Powerpoint keeps crashing.");
+        relaunchedGUI.priorityComboBox.setSelectedIndex(3);
+        relaunchedGUI.reporterTextField.setText("The User");
+        
+        relaunchedGUI.addButton.doClick();
+        
+        //This ticket should have a new ID, positive, not zero, and different to any other in the list.
+        
+        try{
+            LinkedList<Ticket> allTickets = relaunchedProgram.getAllTickets();
+            // Should have 4 tickets now
+            assertEquals("Three test tickets plus one new one should equal 4 tickets in the relaunched app.", 4, relaunchedProgram.getAllTickets().size());
+            
+            boolean found = false;
+            
+            for (Ticket t : allTickets) {
+                if (t.getDescription().contains("Powerpoint")) {
+                    // there's the new ticket
+                    int newId = t.getTicketID();
+                    assertTrue("If existing tickets have IDs 1, 2, 3, new ticket ID must be more than 4", newId >= 4);
+                }
+            }
+            
+            assertTrue("Tried to add new ticket 'Powerpoint keeps crashing' after relaunching program, but did not find it in the ticket list.", found);
+            
+        } catch (Exception e) {
+            fail("Attempting to relaunch program, read ticket store, and search by description to find new ticket; take first item from ticket list.\n" +
+                    "Verify that new ticket are being created in the ticket store when the application is relaunched.");
+        }
+    }
+    
+    
+    private class TicketGUIMockDialog extends TicketGUI {
         TicketGUIMockDialog(TicketProgram t){ super(t);}
         
         private boolean wasAlertCalled = false;
@@ -697,40 +1117,12 @@ public class TicketTest {
             return copyToReturn;
         }
         
-        
     }
     
     
+    // Keep track of files used in tests, and move them to temp folder  after test done.
     
-    @Test(timeout=10000)
-    public void testEndToEnd() throws Exception {
-        // Launch
-        // Add ticket
-        // ticket in list
-        // add another ticket
-        // ticket list correct & msg correct
-        // search for a ticket by id
-        // ticket list correct & msg correct
-        // search for ticket by description
-        // ticket list correct  & msg correct
-        // delete one ticket
-        // ticket list correct  & msg correct
-        // add another ticket
-        // ticket list correct & msg correct
-        // Close
-        // relaunch
-        // ticket list correct & msg correct
-        // search by id
-        // search by description
-        // select and delete one ticket
-        // close and relaunch
-        // ticketlist still correct & msg correct
-        
-        fail();
-
-    }
-
-    ArrayList<String> testFileNames;
+    private ArrayList<String> testFileNames;
     
     @Before
     public void prepareToStoreTestFiles() {
@@ -744,155 +1136,9 @@ public class TicketTest {
         }
     }
     
-    /* *********** Resolved Tickets in Files ********************/
-
-    @Test(timeout=3000)
-    public void saveAndRestoreTickets() throws Exception {
-        
-        // Do not overwrite student's ticket file
-        
-        /* Data:
-        
-        Ticket test1 = new Ticket("Server keeps rebooting", 1, "user 1", new Date());  ID 1
-        Ticket test3 = new Ticket("Mouse stolen", 5, "user 2", new Date());   ID 3
-        Ticket test2 = new Ticket("Mouse mat stolen", 3, "user 2", new Date());   ID 2
-        */
-        
-        String openTicketFile = FileUtils.uniqueFilename("support_ticket_gui");
-        testFileNames.add(openTicketFile);
-        TicketProgram.openTicketsFile = openTicketFile;
-        
-        TicketGUI gui = createGUIWithTestData();
-        LinkedList<Ticket> originalTickets = gui.manager.getAllTickets();
-        
-        gui.saveAndQuitButton.doClick();   // This should invoke the save and quit method for the test Tickets.
-        
-        TicketProgram relaunchedProgram = new TicketProgram();
-        relaunchedProgram.start();
-
-        // The tickets should have been read from a file, and be available.
-
-        LinkedList<Ticket> ticketList_relaunch = relaunchedProgram.getAllTickets();
-
-        assertEquals("There should be the same number of open tickets after your app is restarted. " +
-                "Save all open tickets to a file when app closes, read the tickets from the file when it restarts.",
-                ticketList_relaunch.size(), originalTickets.size());
-
-        // Same tickets? Should be in the same priority order
-
-
-        for (int t = 0 ;  t < ticketList_relaunch.size() ; t++) {
-            String msg = "Read all data from the file to create a new ticket list.  " +
-                    "Wrote out \n%s\n and got \n%s\n back. Make sure all the data is the same as the original ticket.";
-            Ticket expected = originalTickets.get(t);
-            Ticket actual = ticketList_relaunch.get(t);
-
-            assertTrue(String.format(msg, expected, actual), sameOpenTicket(expected, actual));
-        }
-        
-        
-    }
-    
-    
-    @Test(timeout=3000)
-    public void saveResolvedTicketsAppendSameDay() throws Exception {
-    
-        fail();
-    }
-    
-    
-    
-    @Test(timeout=3000)
-    public void testRestoreTicketsNewTicketsUniqueID() throws Exception {
-    
-        String openTicketFile = FileUtils.uniqueFilename("support_ticket_gui");
-        testFileNames.add(openTicketFile);
-        TicketProgram.openTicketsFile = openTicketFile;
-    
-        TicketGUI gui = createGUIWithTestData();
-        LinkedList<Ticket> originalTickets = gui.manager.getAllTickets();
-    
-        gui.saveAndQuitButton.doClick();   // This should invoke the save and quit method for the test Tickets.
-    
-        TicketProgram relaunchedProgram = new TicketProgram();
-        relaunchedProgram.start();
-    
-        // The tickets should have been read from a file, and be available.
-    
-        
-        TicketGUI relaunchedGUI = relaunchedProgram.ticketUI;
-        
-        relaunchedGUI.descriptionTextField.setText("Powerpoint keeps crashing.");
-        relaunchedGUI.priorityComboBox.setSelectedIndex(3);
-        relaunchedGUI.reporterTextField.setText("The User");
- 
-        relaunchedGUI.addButton.doClick();
-        
-        //This ticket should have a new ID, positive, not zero, and different to any other in the list.
-    
-        try{
-            LinkedList<Ticket> allTickets = relaunchedProgram.getAllTickets();
-            // Should have 4 tickets now
-            assertEquals("Three test tickets plus one new one should equal 4 tickets in the relaunched app.", 4, relaunchedProgram.getAllTickets().size());
-    
-            boolean found = false;
-            
-            for (Ticket t : allTickets) {
-                if (t.getDescription().contains("Powerpoint")) {
-                    // there's the new ticket
-                    int newId = t.getTicketID();
-                    assertTrue("If existing tickets have IDs 1, 2, 3, new ticket ID must be more than 4", newId >= 4);
-                    
-                }
-            }
-            
-            assertTrue("Tried to add new ticket 'Powerpoint keeps crashing' after relaunching program, but did not find it in the ticket list.", found);
-            
-        } catch (Exception e) {
-            fail("Attempting to relaunch program, read ticket store, and search by description to find new ticket; take first item from ticket list.\n" +
-                    "Verify that new ticket are being created in the ticket store when the application is relaunched.");
-        }
-    }
-    
-    
-    
-    
-    private TicketGUIMockDialog createGUIWithEmptyTicketStore() {
-    
-        TicketStore testTicketStore = new TicketStore();
-        
-        TicketProgram program = new TicketProgram();
-        program.ticketStore = testTicketStore;     // use test ticket store
-        //program.startGUI();   //bypass the load tickets method
-    
-        TicketGUIMockDialog gui = new TicketGUIMockDialog(program);
-        program.ticketUI = gui;
-    
-        return gui;
    
-    }
-    
-    
-    private TicketGUIMockDialog createGUIWithTestData() {
-        
-        TicketStore testTicketStore = new TicketStore();
-        
-        Ticket test2 = new Ticket("Server keeps rebooting", 1, "user 1", new Date());
-        Ticket test4 = new Ticket("Mouse stolen", 5, "user 2", new Date());
-        Ticket test3 = new Ticket("Mouse mat stolen", 3, "user 2", new Date());
-    
-        testTicketStore.add(test2); testTicketStore.add(test3); testTicketStore.add(test4);
-        
-        TicketProgram program = new TicketProgram();
-        program.ticketStore = testTicketStore;     // use test ticket store
-        //program.startGUI();   //bypass the load tickets method
-        
-        TicketGUIMockDialog gui = new TicketGUIMockDialog(program);
-        program.ticketUI = gui;
-        
-        return gui;
-    }
-    
+  
+   
         
     private boolean sameOpenTicket(Ticket t1, Ticket t2)  {
         // Could override .equals in the Ticket class, but not guaranteed that student will implement extra fields

@@ -2,7 +2,9 @@ package test_utils;
 
 import com.google.common.io.Files;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.UUID;
 
@@ -78,6 +80,28 @@ public class FileUtils {
     }
     
     
+    
+    public static boolean fileContainsText(File file, String text) {
+    
+        try ( BufferedReader reader = new BufferedReader(new FileReader(file)) ) {
+            
+            StringBuilder builder = new StringBuilder();
+            
+            String line;
+            while ( (line = reader.readLine()) != null) {
+                builder.append(line);
+            }
+            
+            String all = builder.toString();
+            
+            return all.contains(text);
+            
+        } catch (IOException ioe) {
+            System.out.println("Warning: error reading file " + file);
+            return false;
+        }
+        
+    }
     
     
 }
