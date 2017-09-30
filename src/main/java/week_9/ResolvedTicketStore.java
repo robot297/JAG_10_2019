@@ -14,7 +14,7 @@ public class ResolvedTicketStore {
         resolvedTickets.add(t);
     }
     
-    public LinkedList<Ticket> getAll() {
+    public LinkedList<Ticket> getAllTickets() {
         return resolvedTickets;
     }
     

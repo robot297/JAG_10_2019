@@ -7,6 +7,7 @@ import java.util.LinkedList;
 public class TicketProgram {
     
     
+    
     TicketFileIO ticketFileIO;
     TicketStore ticketStore;
     TicketGUI ticketGUI;
@@ -27,12 +28,20 @@ public class TicketProgram {
     
     
     protected void setup(LinkedList<Ticket> injectedTestData) {
+        
         createTicketStore();
-        loadTicketsToTicketStore(injectedTestData);
         configureResolvedTickets();
-        configureTicketIdGeneration();
-        startGUI();
+        
+        if (injectedTestData != null) {
+            loadTicketsFromTicketStore(injectedTestData);
+            // configureTicketIdGeneration()  // don't call, let this be the default start ID value of 1
+        } else {
+            loadTicketsFromTicketStore(null);
+            configureTicketIdGeneration();
+        }
     }
+    
+    
     
     // Do any TicketStore setup here
     protected void createTicketStore() {
@@ -40,7 +49,7 @@ public class TicketProgram {
     }
     
     
-    protected void loadTicketsToTicketStore(LinkedList<Ticket> injectedTestData) {
+    protected void loadTicketsFromTicketStore(LinkedList<Ticket> injectedTestData) {
     
         ticketFileIO = new TicketFileIO();
     
