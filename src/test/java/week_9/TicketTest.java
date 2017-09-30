@@ -15,7 +15,7 @@ import static org.junit.Assert.*;
 
 public class TicketTest {
     
-    // Some example test data, created and will be available to any test methods
+    // Some example test data, created before tests run, and available to all test methods
     
     private Ticket test_id_1, test_id_2, test_id_3;
     
@@ -42,6 +42,23 @@ public class TicketTest {
         
         testNextId = 4;
         
+    }
+    
+    
+    // Keep track of files used in tests, and move them to temp folder after test done.
+    
+    private ArrayList<String> testFileNames;
+    
+    @Before
+    public void prepareToStoreTestFiles() {
+        testFileNames = new ArrayList<>();
+    }
+    
+    @After
+    public void cleanupFles() {
+        for (String file : testFileNames) {
+            FileUtils.moveToTemporaryTestFolder(file);
+        }
     }
     
     
@@ -1091,32 +1108,12 @@ public class TicketTest {
     }
     
     
-    // Keep track of files used in tests, and move them to temp folder  after test done.
-    
-    private ArrayList<String> testFileNames;
-    
-    @Before
-    public void prepareToStoreTestFiles() {
-        testFileNames = new ArrayList<>();
-    }
-    
-    @After
-    public void cleanupFles() {
-        for (String file : testFileNames) {
-            FileUtils.moveToTemporaryTestFolder(file);
-        }
-    }
-    
-    
-    
     
     
     private boolean sameOpenTicket(Ticket t1, Ticket t2)  {
         // Could override .equals in the Ticket class, but not guaranteed that student will implement extra fields
         // Overriding .equals requires hashcode to be overriden too, and that's out of scope for this problem
-        
         return sameOpenTicket(t1, t2, 0);
-        
     }
     
     

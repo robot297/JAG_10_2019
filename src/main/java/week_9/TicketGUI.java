@@ -70,6 +70,7 @@ public class TicketGUI extends JFrame {
     // Call this method to quit the program. The tests expect you to use it.
     protected void quitProgram() {
         manager.quitProgram();
+        this.dispose();
     }
     
     

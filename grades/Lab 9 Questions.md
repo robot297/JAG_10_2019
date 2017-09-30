@@ -9,7 +9,7 @@ Tickets need to store the priority, a description of the Task, the person who re
 
 1 is the most urgent (e.g. all servers down); 5 is the least (e.g. missing mouse mat). 
 
-When a Task is fixed, the ticket is deleted and the reason for deleting the tickt is recorded. 
+When a Ticket is resolved (fixed or become non-issue), the ticket is deleted and the reason for deleting the ticket is recorded. 
 
 Your Ticket objects should be able to store another date; `resolvedDate`, the date the ticket was closed.
 And, a String that documents why the ticket was closed – the fix or the resolution for the ticket. This String should be called `resolution`
@@ -101,7 +101,9 @@ Add a listener to `saveAndQuitButton`. This should call the `manager.quitProgram
 
 You should be able to use the same code written in the previous version of this program.
 
- TicketProgram should then exit the program with a `System.exit(0)` call.
+The TicketGUI should close itself by calling `dispose()`.  This is the only task running so will cause the program to exit.
+ 
+ You should not save tickets to file until the user quits the program.
 
 ### Task 9: Load Tickets on relaunch
 
@@ -111,7 +113,7 @@ You should be able to use the same code written in the previous version of this 
 
 You don't need to read in the previous resolved tickets. 
 
-As before, what happens to ticket IDs when the program is closed and opened? Make sure they don't reset to 1 when the user restarts the program. Every ticket created should always have a unique positive integer ID, (excluding 0) no matter how many times the program is used*. 
+As before, what happens to ticket IDs when the program is closed and opened? Make sure they don't reset to 1 when the user restarts the program. Every ticket created should always have a unique positive integer ID, (excluding 0) no matter how many times the program is used*.   Save the counter information in a file with the name given by `TicketProgram.ticketCounterFile`.
 
 You will need to create a second constructor for creating a tickets when the ID is already known. Make sure you don't break your mechanism for ensuring unique IDs. 
 
