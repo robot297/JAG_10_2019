@@ -37,6 +37,9 @@ public class Ticket {
     
     
     // TODO use this constructor to create a Ticket from existing Ticket data read from a file
+    // Notice that it does not affect the static ticketIDCounter
+    // Use the setNextID and getNextId method if you need to change the next ticketID that will
+    // be generated, for example, if you are re-starting the program
     public Ticket(int id, String desc, int p, String rep, Date date) {
         this.description = desc;
         this.priority = p;
@@ -45,6 +48,14 @@ public class Ticket {
         this.ticketID = id;
     }
     
+    
+    public static int getNextId(){
+        return ticketIdCounter;
+    }
+    
+    public static void setNextId(int counter){
+        ticketIdCounter = counter;
+    }
     
     
     public void setPriority(int priority) {
@@ -96,6 +107,8 @@ public class Ticket {
     public void setDateResolved(Date dateResolved) {
         this.dateResolved = dateResolved;
     }
+    
+    
     
     public String toString(){
         return("ID: " + this.ticketID + " Description: " + this.description + " Priority: " + 					this.priority + " Reported by: "

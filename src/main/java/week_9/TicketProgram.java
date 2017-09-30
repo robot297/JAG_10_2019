@@ -6,41 +6,45 @@ import java.util.LinkedList;
 
 public class TicketProgram {
     
-    
-    
     TicketFileIO ticketFileIO;
     TicketStore ticketStore;
     TicketGUI ticketGUI;
     ResolvedTicketStore resolvedTicketStore;
     
-    
     static String openTicketsFile = "opentickets.txt";
     static String resolvedTicketsFilePrefix = "Resolved_Tickets_"; // for making a filename like  "Resolved_Tickets_September_28_2017.txt"
+    static String ticketCounterFile = "ticket_counter.txt";
     
     
     public static void main(String[] args) {
         TicketProgram ticketProgram = new TicketProgram();
-        
-        ticketProgram.setup(null);
-        ticketProgram.startGUI();
-        
+        ticketProgram.start();
     }
     
     
-    protected void setup(LinkedList<Ticket> injectedTestData) {
-        
+    // default start of program
+    void start() {
+        setup();
+        startGUI();
+    }
+    
+    
+    protected void setup() {
         createTicketStore();
         configureResolvedTickets();
-        
-        if (injectedTestData != null) {
-            loadTicketsFromTicketStore(injectedTestData);
-            // configureTicketIdGeneration()  // don't call, let this be the default start ID value of 1
-        } else {
-            loadTicketsFromTicketStore(null);
-            configureTicketIdGeneration();
-        }
+        // Start normally
+        loadTicketsFromTicketStore(null);   // No open tickets
+        configureTicketIdGenerator(null);    // First ticket created will have ID = 1
     }
     
+    // To run the program with test data, call this method with desired test data.
+    
+    protected void setup(LinkedList<Ticket> injectedTestData, int nextTicketId) {
+        createTicketStore();
+        configureResolvedTickets();
+        loadTicketsFromTicketStore(injectedTestData);
+        configureTicketIdGenerator(nextTicketId);
+    }
     
     
     // Do any TicketStore setup here
@@ -50,9 +54,9 @@ public class TicketProgram {
     
     
     protected void loadTicketsFromTicketStore(LinkedList<Ticket> injectedTestData) {
-    
+        
         ticketFileIO = new TicketFileIO();
-    
+        
         if (injectedTestData != null) {
             ticketStore.addAll(injectedTestData);
         }
@@ -69,9 +73,18 @@ public class TicketProgram {
         resolvedTicketStore = new ResolvedTicketStore();
     }
     
-    
-    protected void configureTicketIdGeneration() {
-        // TODO 7 If you need to do anything to assist generating unique ticket IDs, do it here.
+    protected void configureTicketIdGenerator(Integer defaultNextTicketId) {
+        
+        System.out.println("defaultNextTicketId = " + defaultNextTicketId);
+        if (defaultNextTicketId == null) {
+            // TODO 7 If you need to do anything to assist generating unique ticket IDs, do it here.
+           
+            
+        } else {
+            Ticket.setNextId(defaultNextTicketId);
+        }
+        
+        System.out.println("The next ticket will have the id = " + Ticket.getNextId());
     }
     
     

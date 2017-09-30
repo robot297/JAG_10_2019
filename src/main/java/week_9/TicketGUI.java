@@ -39,7 +39,7 @@ public class TicketGUI extends JFrame {
     
     
     // Messages for showing in ticketListStatusDescription
-    static final String ALL_TICKETS = "showing all tickets";
+    static final String ALL_TICKETS = "Showing all tickets";
     static final String TICKETS_MATCHING_DESCRIPTION = "Tickets matching search description";
     static final String TICKET_MATCHING_ID = "Ticket matching ID";
     static final String NO_TICKETS_FOUND = "No matching tickets";
