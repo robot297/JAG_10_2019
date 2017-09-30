@@ -51,11 +51,30 @@ public class TicketTest {
     
     @Before
     public void prepareToStoreTestFiles() {
+        
         testFileNames = new ArrayList<>();
+        
+        String openTickets = FileUtils.uniqueFilename("test_open_tickets");
+        TicketProgram.openTicketsFile = openTickets;
+        testFileNames.add(openTickets);
+        
+        String resolvedTicketFilePrefix = FileUtils.uniqueFilename("test_resolved_tickets");
+        TicketProgram.resolvedTicketsFilePrefix = resolvedTicketFilePrefix;
+        // Expected filename: resolvedTicketFile_September_08_2017.txt
+        SimpleDateFormat format = new SimpleDateFormat("MMMM_dd_yyyy");
+        Date date = new Date();
+        String today = format.format(date);
+        String expectedFileName = resolvedTicketFilePrefix + today + ".txt";
+        
+        testFileNames.add(expectedFileName);
+        
+        String ticketCounterFile = FileUtils.uniqueFilename("test_ticket_counter");
+        TicketProgram.ticketCounterFile = ticketCounterFile;
+        testFileNames.add(ticketCounterFile);
     }
     
     @After
-    public void cleanupFles() {
+    public void cleanupFiles() {
         for (String file : testFileNames) {
             FileUtils.moveToTemporaryTestFolder(file);
         }
@@ -888,33 +907,24 @@ public class TicketTest {
         
     }
     
-    
     /// TASK 8 Save and Quit, tickets to file, available when program relaunches
     
     @Test(timeout=10000)
     public void saveAndRestoreTickets() throws Exception {
         
-        //LinkedList<Ticket> originalTickets = generateTestTickets();
-        
         TicketProgram program = new TicketProgram();
         program.setup(testTickets, 1);
         program.startGUI();
-        
-        String openTicketFile = FileUtils.uniqueFilename("open_tickets");  // adds on some unique characters to avoid overwriting student file
-        testFileNames.add(openTicketFile);   // add to list that will be moved to test file directory after test
-        TicketProgram.openTicketsFile = openTicketFile;
         
         LinkedList<Ticket> originalTicketList = program.getAllTickets();
         
         program.ticketGUI.saveAndQuitButton.doClick();   // This should invoke the save and quit method for the test Tickets.
         
         // Now restart program
-        
         TicketProgram relaunchedProgram = new TicketProgram();
         relaunchedProgram.start();   // program loads normally
         
         // The tickets should have been read from a file, and be available.
-        
         LinkedList<Ticket> ticketList_relaunch = relaunchedProgram.getAllTickets();
         
         assertEquals("There should be the same number of open tickets after your app is restarted. " +
@@ -931,8 +941,47 @@ public class TicketTest {
             
             assertTrue(String.format(msg, expected, actual), sameOpenTicket(expected, actual));
         }
+        
+        // Add a new ticket
+        relaunchedProgram.ticketGUI.descriptionTextField.setText("Excel is broken");
+        relaunchedProgram.ticketGUI.reporterTextField.setText("Another User");
+        relaunchedProgram.ticketGUI.priorityComboBox.setSelectedItem(4);
+        relaunchedProgram.ticketGUI.addButton.doClick();
+        relaunchedProgram.ticketGUI.saveAndQuitButton.doClick();
+        
+        // Expect to have 4 tickets
+        LinkedList<Ticket> relaunchedListPlusOneMore = relaunchedProgram.getAllTickets();
+        
+        // Save and close again
+        relaunchedProgram.ticketGUI.saveAndQuitButton.doClick();
+        
+        // Should be a total of 4 tickets - not 3, not 7
+        
+        TicketProgram relaunch2 = new TicketProgram();
+        relaunch2.start();
+        
+        // Same tickets as relaunchedList
+        // Expect to have 4 tickets
+        LinkedList<Ticket> relaunchedList2 = relaunch2.getAllTickets();
+        
+        assertEquals("There should be the same number of open tickets after your app is restarted. " +
+                        "Save all open tickets to a file when app closes, read the tickets from the file when it restarts.",
+                relaunchedListPlusOneMore.size(), relaunchedList2.size());
+        
+        // Same tickets? Should be in the same priority order
+        for (int t = 0 ;  t < relaunchedList2.size() ; t++) {
+            String msg = "Read all data from the file to create a new ticket list. " +
+                    "Wrote out \n%s\n and got \n%s\n back. Make sure all the data is the same as the original ticket.";
+            Ticket expected = relaunchedListPlusOneMore.get(t);
+            Ticket actual = relaunchedList2.get(t);
+            
+            assertTrue(String.format(msg, expected, actual), sameOpenTicket(expected, actual));
+        }
+        
+        
+        
+        
     }
-    
     
     // TASK 9 Save resolved tickets
     
@@ -950,16 +999,12 @@ public class TicketTest {
         TicketGUIMockDialog gui = new TicketGUIMockDialog(program);
         program.ticketGUI = gui;
         
-        String resolvedTicketFilePrefix = FileUtils.uniqueFilename("test_resolved_tickets");
-        TicketProgram.resolvedTicketsFilePrefix = resolvedTicketFilePrefix;
-        
         // Expected filename: resolvedTicketFile_September_08_2017.txt
         SimpleDateFormat format = new SimpleDateFormat("MMMM_dd_yyyy");
         Date date = new Date();
         String today = format.format(date);
         
-        String expectedFileName = resolvedTicketFilePrefix + today + ".txt";
-        testFileNames.add(expectedFileName);
+        String expectedFileName = TicketProgram.resolvedTicketsFilePrefix + today + ".txt";
         
         // resolve first two tickets
         gui.mockUserInput = resolutions[0];
@@ -972,7 +1017,6 @@ public class TicketTest {
         gui.saveAndQuitButton.doClick();   // This should invoke the save and quit method for the test Tickets.
         
         // Something in the file?
-        
         File f = new File(expectedFileName);
         
         assertTrue(f.exists());
@@ -993,8 +1037,6 @@ public class TicketTest {
         gui = new TicketGUIMockDialog(program);  // replace gui
         program.ticketGUI = gui;
         
-        TicketProgram.resolvedTicketsFilePrefix = resolvedTicketFilePrefix;
-        
         // resolve first two tickets
         gui.mockUserInput = resolutions[2];
         gui.ticketList.setSelectedIndex(0);
@@ -1014,20 +1056,16 @@ public class TicketTest {
         assertTrue("The resolved ticket should be written to a file", FileUtils.fileContainsText(f, resolutions[1]));
         assertTrue("The resolved ticket should be written to a file", FileUtils.fileContainsText(f, resolutions[2]));
         
-        
-        
-        
-        
     }
     
     
     @Test(timeout=10000)
     public void testRestoreTicketsNewTicketsUniqueID() throws Exception {
-        
-        String openTicketFile = FileUtils.uniqueFilename("support_ticket_gui");
-        testFileNames.add(openTicketFile);
-        TicketProgram.openTicketsFile = openTicketFile;
-        
+
+//        String openTicketFile = FileUtils.uniqueFilename("support_ticket_gui");
+//        testFileNames.add(openTicketFile);
+//        TicketProgram.openTicketsFile = openTicketFile;
+//
         TicketProgram program = new TicketProgram();
         
         program.setup(testTickets, testNextId);
@@ -1109,7 +1147,6 @@ public class TicketTest {
     
     
     
-    
     private boolean sameOpenTicket(Ticket t1, Ticket t2)  {
         // Could override .equals in the Ticket class, but not guaranteed that student will implement extra fields
         // Overriding .equals requires hashcode to be overriden too, and that's out of scope for this problem
@@ -1132,15 +1169,5 @@ public class TicketTest {
         return dateDiff <= acceptableMsDifferenceInDate;
         
     }
-    
-    
-    
-    
-    @Test
-    public void testManualChecksQuestion() {
-        fail("This test is supposed to fail. Tests can't check every aspect of this program. " +
-                "\nThe instructor will check your work and assign the rest of the points");
-    }
-    
     
 }
