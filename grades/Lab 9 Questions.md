@@ -99,15 +99,18 @@ Or, the user will type in a resolution String and click the OK button. Do the fo
 
 Add a listener to `saveAndQuitButton`. This should call the `manager.quitProgram()` method, which will use TicketFileIO to to save all current open and resolved Tickets to files, as implemented in the previous lab.
 
+As before, save all program data in a directory called TicketData. Your program should use the `ticketDataDirectory` variable for the directory name, so the tests can replace this name with a test directory and avoid overwriting your data.
+
 You should be able to use the same code written in the previous version of this program.
 
 The TicketGUI should close itself by calling `dispose()`.  This is the only task running so will cause the program to exit.
  
- You should not save tickets to file until the user quits the program.
+You should not save tickets to file until the user quits the program.
+  
 
 ### Task 9: Load Tickets on relaunch
 
-When your program opens, it should read in open Ticket information from `open_tickets.txt`, if this file exists. Your program should provide these to the GUI so all open Tickets are shown in `ticketList` when the program opens. 
+When your program opens, it should read in open Ticket information from `TicketData/open_tickets.txt`, if this file exists. Your program should provide these to the GUI so all open Tickets are shown in `ticketList` when the program opens. 
 
 You should be able to use the same code written in the previous version of this program.
 

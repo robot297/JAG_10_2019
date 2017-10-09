@@ -16,6 +16,10 @@ public class TicketProgram {
     static String ticketCounterFile = "ticket_counter.txt";
     
     
+    // Write and read to files in this directory. The tests will use a different directory, but same filenames.
+    static String ticketDataDirectory = "TicketData";
+    
+    
     public static void main(String[] args) {
         TicketProgram ticketProgram = new TicketProgram();
         ticketProgram.start();
