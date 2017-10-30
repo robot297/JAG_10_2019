@@ -130,6 +130,6 @@ As before, what happens to ticket IDs when the program is closed and opened? Mak
 
 You will need to use a second constructor for creating a tickets when the ID is already known. Make sure you don't break your mechanism for ensuring unique IDs. 
 
-*Actually, you'll only be able to create approx 2 billion ticket IDs with this approach. That should be enough for now, although perhaps something to revisit in a future version.
+*Actually, you'll only be able to create approx 2 billion valid ticket IDs with this approach. That should be enough for now, although perhaps something to revisit in a future version.
 
 Ensure that you include your mechanism for generating unique positive integer IDs for your Ticket objects. 
