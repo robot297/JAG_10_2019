@@ -5,7 +5,6 @@ import javax.swing.*;
 
 public class TicketGUI extends JFrame {
     
-    
     // TODO complete the tasks described in grades/Lab 9 Questions.md
     
     protected JPanel mainPanel;
@@ -39,6 +38,7 @@ public class TicketGUI extends JFrame {
     
     
     // Messages for showing in ticketListStatusDescription
+    // Use these instead of your own Strings, the tests expect you to use these variables
     static final String ALL_TICKETS = "Showing all tickets";
     static final String TICKETS_MATCHING_DESCRIPTION = "Tickets matching search description";
     static final String TICKET_MATCHING_ID = "Ticket matching ID";
@@ -61,8 +61,7 @@ public class TicketGUI extends JFrame {
         setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         
-        // TODO complete the tasks described in grades/Lab 9 Questions.md
-
+        
     }
     
     
@@ -74,16 +73,15 @@ public class TicketGUI extends JFrame {
     }
     
     
-    // Use this method to show Alert dialogs. Otherwise tests for
-    // code that shows Alert Dialogs will time out and fail.
-    protected void showAlertDialog(String message) {
+    // Use this method to show message dialogs displaying the message given.
+    // Otherwise tests for code that shows alert dialogs will time out and fail.
+    protected void showMessageDialog(String message) {
         JOptionPane.showMessageDialog(this, message);
     }
     
-    // Use this method to show input dialogs. Otherwise tests for
-    // code that shows Alert Dialogs will time out and fail.
-    
-    // If user cancels, this will return null.
+    // Use this method to show input dialogs asking the given question.
+    // Otherwise tests for code that shows input dialogs will time out and fail.
+    // If user presses the cancel button, this method will return null.
     protected String showInputDialog(String question) {
         return JOptionPane.showInputDialog(this, question);
     }

@@ -41,15 +41,7 @@ public class TicketProgram {
         configureTicketIdGenerator(null);    // First ticket created will have ID = 1
     }
     
-    // To run the program with test data, call this method with desired test data.
-    
-    protected void setup(LinkedList<Ticket> injectedTestData, int nextTicketId) {
-        createTicketStore();
-        configureResolvedTickets();
-        loadTicketsFromTicketStore(injectedTestData);
-        configureTicketIdGenerator(nextTicketId);
-    }
-    
+ 
     
     // Do any TicketStore setup here
     protected void createTicketStore() {
@@ -141,6 +133,20 @@ public class TicketProgram {
     
     
     }
+    
+    
+    
+    
+    // To run the program with test data, call this method with desired test data.
+    // You don't need to modify this method.
+    
+    protected void setup(LinkedList<Ticket> injectedTestData, int nextTicketId) {
+        createTicketStore();
+        configureResolvedTickets();
+        loadTicketsFromTicketStore(injectedTestData);
+        configureTicketIdGenerator(nextTicketId);
+    }
+    
     
     
 }

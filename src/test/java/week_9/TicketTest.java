@@ -24,6 +24,12 @@ public class TicketTest {
     private int testNextId;    // Based on the given test data.
     
     @Before
+    public void resetTicketIDCounter() {
+        Ticket.setNextId(1);
+    }
+    
+    
+    @Before
     public void generateTestTickets() {
         
         Ticket.setNextId(1);
@@ -492,9 +498,9 @@ public class TicketTest {
         // click add button
         gui.addButton.doClick();
         
-        // should be alert dialog shown
-        assertTrue(String.format("Show an alert dialog if the new ticket data if description= '%s' reporter= '%s' priority= %s", description, reporter, comboboxSelection),
-                gui.checkAlertWasCalled());
+        // should be message dialog shown
+        assertTrue(String.format("Show a message dialog if the new ticket data if description= '%s' reporter= '%s' priority= %s", description, reporter, comboboxSelection),
+                gui.checkMessageWasCalled());
         
         // Nothing in JList or ticket Store
         assertEquals("After attempting to add invalid ticket, there should be no tickets in the ticketList",
@@ -703,9 +709,9 @@ public class TicketTest {
         gui.ticketList.clearSelection();   // Unselect everything
         gui.deleteSelectedButton.doClick();
         
-        // expect an alert dialog to be shown
-        assertTrue("Show an alert dialog if the user clicks the delete selected " +
-                "button without anything selected in the ticketList ", gui.wasAlertCalled);
+        // expect a message dialog to be shown
+        assertTrue("Show a message dialog if the user clicks the delete selected " +
+                "button without anything selected in the ticketList ", gui.wasMessageCalled);
         
     }
     
@@ -752,8 +758,8 @@ public class TicketTest {
         assertEquals("The second ticket should be ID 3", 3, model.get(1).getTicketID());
         assertEquals("The third ticket should be ID 2", 2, model.get(2).getTicketID());
         
-        // An alert dialog should NOT been shown
-        assertFalse("Do not delete or show a delete confirmation alert dialog when delete was cancelled", gui.checkAlertWasCalled());
+        // A message dialog should NOT been shown
+        assertFalse("Do not delete or show a delete confirmation message dialog when delete was cancelled", gui.checkMessageWasCalled());
         
         // On the back end, resolved tickets should NOT contain this ticket
         LinkedList<Ticket> resolved = program.resolvedTicketStore.getAllTickets();
@@ -807,8 +813,8 @@ public class TicketTest {
         assertEquals("The second remaining ticket should be ID 2", 2, model.get(1).getTicketID());
         
         
-        // An alert dialog should have been shown
-        assertTrue("Show a confirmation alert dialog when ticket has been deleted", gui.checkAlertWasCalled());
+        // A message dialog should have been shown
+        assertTrue("Show a confirmation message dialog when ticket has been deleted", gui.checkMessageWasCalled());
         
         
         // On the back end, resolved tickets should contain this ticket
@@ -849,8 +855,8 @@ public class TicketTest {
         assertEquals("After deleting another ticket from the list, there should be one remaining", 1, model.getSize());
         assertEquals("The remaining ticket should be ID 2", 2, model.get(0).getTicketID());
         
-        // An alert dialog should have been shown
-        assertTrue("Show a confirmation alert dialog when ticket has been deleted", gui.checkAlertWasCalled());
+        // A message dialog should have been shown
+        assertTrue("Show a confirmation message dialog when ticket has been deleted", gui.checkMessageWasCalled());
         
         // On the back end, resolved tickets should contain this ticket
         resolved = program.resolvedTicketStore.getAllTickets();
@@ -888,8 +894,8 @@ public class TicketTest {
         // The GUI should remove the ticket from the list
         assertEquals("After deleting another ticket from the list, there should be none remaining", 0, model.getSize());
         
-        // An alert dialog should have been shown
-        assertTrue("Show a confirmation alert dialog when ticket has been deleted", gui.checkAlertWasCalled());
+        // A message dialog should have been shown
+        assertTrue("Show a confirmation message dialog when ticket has been deleted", gui.checkMessageWasCalled());
         
         // On the back end, resolved tickets should contain this ticket
         resolved = program.resolvedTicketStore.getAllTickets();
@@ -1121,18 +1127,18 @@ public class TicketTest {
     private class TicketGUIMockDialog extends TicketGUI {
         TicketGUIMockDialog(TicketProgram t){ super(t);}
         
-        private boolean wasAlertCalled = false;
+        private boolean wasMessageCalled = false;
         
-        protected boolean checkAlertWasCalled() {
-            boolean copyToReturn = wasAlertCalled;
-            wasAlertCalled = false;
+        protected boolean checkMessageWasCalled() {
+            boolean copyToReturn = wasMessageCalled;
+            wasMessageCalled = false;
             return copyToReturn;
         }
         
         @Override
-        protected void showAlertDialog(String msg){
-            // do nothing so the program does not show an alert dialog
-            wasAlertCalled = true;
+        protected void showMessageDialog(String msg){
+            // do nothing so the program does not show a message dialog
+            wasMessageCalled = true;
         }
         
         // Set this to force showInputDialog to return a particular value. Do this before the inputDialog is expected to be called.
