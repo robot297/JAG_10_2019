@@ -952,7 +952,7 @@ public class TicketTest {
             Ticket expected = originalTicketList.get(t);
             Ticket actual = ticketList_relaunch.get(t);
             
-            assertTrue(String.format(msg, expected, actual), sameOpenTicket(expected, actual));
+            assertTrue(String.format(msg, expected, actual), sameOpenTicket(expected, actual, 2000));
         }
         
         // Add a new ticket
