@@ -8,7 +8,7 @@ public class TicketFileIO {
     
     
     // Ensure you save your files in the directory name given
-    // in the
+    // in the instructions.
     
     /** Save the list of tickets to the file with the given name */
     public static void saveTickets(LinkedList<Ticket> ticketList, String fileName, boolean append) {

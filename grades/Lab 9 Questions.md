@@ -117,6 +117,7 @@ The TicketGUI should close itself by calling `dispose()`.  This is the only task
  
 You need not save tickets to file until the user quits the program.
   
+Use the same filenames as Lab 7.  
 
 ### Task 9: Load Open Tickets on Relaunch
 
