@@ -1032,7 +1032,7 @@ public class TicketTest {
         // Something in the file?
         File f = new File(expectedFileName);
         
-        assertTrue(f.exists());
+        assertTrue("Expected that file to store resolved tickets was created. \nThe test used the file name " + expectedFileName, f.exists());
         
         long fileSize = f.length();
         
