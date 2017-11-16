@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 /**
  * A data structure to store Tickets in memory as the program runs
- * Stores tickets in priority order, so tickets with priority 5 are at the start
+ * Stores tickets in priority order, so tickets with priority 1 are at the start
  * If more than one ticket with same priority, oldest tickets are before newer tickets
  * Supports add, delete, search operations on the list of Tickets
  */
