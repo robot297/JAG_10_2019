@@ -15,10 +15,27 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.7.0</version>
+
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
                 </configuration>
+            </plugin>
+
+
+            <!--Plugin to provide Maven with the same compiler that IntelliJ uses to build GUIs from it's GUI designer.  -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>ideauidesigner-maven-plugin</artifactId>
+                <version>1.0-beta-1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>javac2</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
         </plugins>
@@ -26,10 +43,19 @@
 
 
     <properties>
-        <powermock.version>1.6.6</powermock.version>
+        <!-- set file encoding to avoid platform-specific default text encoding-->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
+
+
+        <dependency>
+            <groupId>com.intellij</groupId>
+            <artifactId>forms_rt</artifactId>
+            <version>7.0.3</version>
+        </dependency>
+
 
         <dependency>
             <groupId>edu.minneapolis</groupId>
@@ -68,29 +94,6 @@
             <version>22.0</version>
         </dependency>
 
-
-
-
-        <!-- EasyMock is a mocking framework. PowerMock is an extension that works with EasyMock.
-        Used for creating pretend objects that we can pre-configure their behavior and return values, useful in testing to avoid having to completely set up a program -->
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <version>3.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-module-junit4</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-easymock</artifactId>
-            <version>${powermock.version}</version>
-            <scope>test</scope>
-        </dependency>
 
     </dependencies>
 
