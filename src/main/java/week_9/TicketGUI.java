@@ -1,6 +1,10 @@
 package week_9;
 
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
+
 import javax.swing.*;
+import java.awt.*;
 
 
 public class TicketGUI extends JFrame {
@@ -63,7 +67,6 @@ public class TicketGUI extends JFrame {
         
         
     }
-    
     
     
     // Call this method to quit the program. The tests expect you to use it.
