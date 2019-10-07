@@ -1,6 +1,6 @@
-# Lab 9: More GUI programs:  Support Ticket Application
+# Lab 10: More GUI programs: Support Ticket Application
 
-This program adds a GUI to the command line Support Ticket application from a previous lab.
+This program adds a GUI and database to the command line Support Ticket application from a previous lab.
 
 This program is a prototype to manage IT support tickets for a company. Users will call or email a helpdesk to report computer problems. The technician will enter the information into this program, which will keep a record of all current problems. 
 
@@ -16,8 +16,16 @@ And, a String that documents why the ticket was closed – the fix or the resolu
 
 For this lab, you will implement a GUI for the program. 
 
+### Task 1: 
 
-### Task 1: TicketGUI, Set up priorityComboBox
+set up database 
+
+### Task 1: 
+
+set up ticket class
+
+
+### Task 3: TicketGUI, Set up priorityComboBox
 
 Configure `priorityComboBox` so it contains the choices 1, 2, 3, 4, 5.
 
@@ -123,14 +131,3 @@ Use the same filenames as Lab 7.
 
 When your program opens, it should read in open Ticket information from `TicketData/open_tickets.txt`, if this file exists. Your program should provide these to the GUI so all open Tickets are shown in `ticketList` when the program opens. 
 
-You should be able to use the same code written in the previous version of this program.
-
-You don't need to read in the previous resolved tickets. 
-
-As before, what happens to ticket IDs when the program is closed and opened? Make sure they don't reset to 1 when the user restarts the program. Every ticket created should always have a unique positive integer ID, (excluding 0) no matter how many times the program is used*.   Save the counter information in a file with the name given by `TicketProgram.ticketCounterFile`.
-
-You will need to use a second constructor for creating a tickets when the ID is already known. Make sure you don't break your mechanism for ensuring unique IDs. 
-
-*Actually, you'll only be able to create approx 2 billion valid ticket IDs with this approach. That should be enough for now, although perhaps something to revisit in a future version.
-
-Ensure that you include your mechanism for generating unique positive integer IDs for your Ticket objects. 
