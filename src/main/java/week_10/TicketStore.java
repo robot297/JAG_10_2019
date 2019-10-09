@@ -1,5 +1,7 @@
 package week_10;
 
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -18,7 +20,8 @@ public class TicketStore {
     TicketStore(String databaseURI) {
         this.dbURI = databaseURI;
         
-        /* TODO create the Ticket database. It should have these fields and constraints:
+        /* TODO create the Ticket table.
+             It should have these fields and constraints:
               rowID, an autogenerating ID  (remember SQLite can autogenerate this for you)
               priority, a number in the range 1-5, not null. Add constraints to prohibit priorities outside this range.
               description, text, not null
@@ -27,6 +30,24 @@ public class TicketStore {
               dateResolved, number, the long time value of a Date object, representing the date the ticket was marked as resolved. Not required.
               status, text, either "OPEN" or "RESOLVED". Required.
         */
+        
+        String sql = "CREATE DATABASE IF NOT EXISTS tickets (" +
+                "priority number not null check(priority>=1 AND priority<=5), " +
+                "description text not null, " +
+                "dateReported number not null " +
+                "resolution text" +
+                "dateResolved number" +
+                ")";
+        
+        try (Connection c = DriverManager.getConnection(databaseURI);
+        Statement statement = c.createStatement() ) {
+    
+            statement.execute(sql);
+    
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        
         
     }
     
@@ -44,7 +65,43 @@ public class TicketStore {
         //  Return a List of these Ticket objects
         //  If there are no Tickets in the database, return an empty List.
         
-        return null;
+//        return null;
+    
+        try (Connection connection = DriverManager.getConnection(dbURI);
+             Statement statement = connection.createStatement()  ) {
+        
+            ResultSet resultSet = statement.executeQuery("SELECT rowid, * FROM tickets WHERE status = 'OPEN' ORDER BY priority");
+        
+            List<Ticket> movies = new ArrayList<>();
+        
+            while (resultSet.next()) {
+                int ticketID = resultSet.getInt("rowid");
+    
+                String description = resultSet.getString("description");
+                int priority = resultSet.getInt("priority");
+                String reporter = resultSet.getString("reporter");
+                Date dateReported = new Date(resultSet.getLong("dateReported"));
+                
+                String resolution = resultSet.getString("resolution");
+                
+                long dateResolvedLong = resultSet.getLong("dateResolved");
+                Date dateResolved = null;
+                if (dateResolvedLong != 0) {
+                    dateResolved = new Date(dateResolvedLong);
+                }
+                
+                
+                Ticket.TicketStatus status = Ticket.TicketStatus.valueOf(resultSet.getString("status"));
+            
+                Ticket movie = new Ticket(ticketID, description, priority, reporter, dateReported, resolution, dateResolved, status);
+                movies.add(movie);
+            }
+        
+            return movies;
+        
+        } catch (SQLException sqle) {
+            throw new RuntimeException("Error fetching all movies", sqle);
+        }
     }
     
     
