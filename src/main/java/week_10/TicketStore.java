@@ -2,6 +2,7 @@ package week_10;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -32,11 +33,13 @@ public class TicketStore {
         */
         
         String sql = "CREATE DATABASE IF NOT EXISTS tickets (" +
+                "description TEXT not null, " +
                 "priority number not null check(priority>=1 AND priority<=5), " +
                 "description text not null, " +
-                "dateReported number not null " +
-                "resolution text" +
-                "dateResolved number" +
+                "dateReported number not null, " +
+                "resolution text, " +
+                "dateResolved number, " +
+                "status text check(resolution like 'RESOLVED' OR resolution like 'OPEN') " +
                 ")";
         
         try (Connection c = DriverManager.getConnection(databaseURI);
@@ -45,10 +48,8 @@ public class TicketStore {
             statement.execute(sql);
     
         } catch (SQLException e) {
-            System.out.println(e);
+            System.out.println("Error creating database because " + e.getMessage());
         }
-        
-        
     }
     
     
@@ -72,7 +73,7 @@ public class TicketStore {
         
             ResultSet resultSet = statement.executeQuery("SELECT rowid, * FROM tickets WHERE status = 'OPEN' ORDER BY priority");
         
-            List<Ticket> movies = new ArrayList<>();
+            List<Ticket> tickets = new ArrayList<>();
         
             while (resultSet.next()) {
                 int ticketID = resultSet.getInt("rowid");
@@ -93,11 +94,11 @@ public class TicketStore {
                 
                 Ticket.TicketStatus status = Ticket.TicketStatus.valueOf(resultSet.getString("status"));
             
-                Ticket movie = new Ticket(ticketID, description, priority, reporter, dateReported, resolution, dateResolved, status);
-                movies.add(movie);
+                Ticket ticket = new Ticket(ticketID, description, priority, reporter, dateReported, resolution, dateResolved, status);
+                tickets.add(ticket);
             }
         
-            return movies;
+            return tickets;
         
         } catch (SQLException sqle) {
             throw new RuntimeException("Error fetching all movies", sqle);
@@ -109,8 +110,52 @@ public class TicketStore {
     public void add(Ticket newTicket) {
         // TODO insert a new row in the database for this ticket.
         //  Write the data from the fields in the newTicket object.
+        
+        String sql = "INSERT INTO tickets values (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection connection = DriverManager.getConnection(dbURI);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            
+         /*
+             String sql = "CREATE DATABASE IF NOT EXISTS tickets (" +
+                "priority number not null check(priority>=1 AND priority<=5), " +
+                "description text not null, " +
+                "dateReported number not null, " +
+                "resolution text, " +
+                "dateResolved number, " +
+                "status text check(resolution like 'RESOLVED' OR resolution like 'OPEN') " +
+                ")";
+            */
+         
+         statement.setString(1, newTicket.getDescription());
+         statement.setInt(2, newTicket.getPriority());
+         statement.setString(3, newTicket.getDescription());
+         statement.setLong(4, newTicket.getDateReportedTimeStamp());
+         statement.setString(5, newTicket.getResolution());
+         statement.setLong(6, newTicket.getDateResolvedTimeStamp());
+         statement.setString(7, newTicket.getStatus().name());
+         
+         statement.executeUpdate();
+         
+        } catch (SQLException e) {
+            System.out.println("Error adding ticket because " + e);
+        }
+        
+        
     }
     
+    private Ticket rowToTicket(ResultSet rs) throws SQLException {
+        
+        return new Ticket(
+                rs.getInt("id"),
+                rs.getString("description"),
+                rs.getInt("priority"),
+                rs.getString("reporter"),
+                new Date(rs.getLong("dateReported")),
+                rs.getString("resolution"),
+                new Date(rs.getLong("dateResolved")),
+                Ticket.TicketStatus.valueOf(rs.getString("status"))
+        );
+    }
     
     /** Searches store for ticket with given ID.
      * @param id The ticket ID
@@ -121,14 +166,48 @@ public class TicketStore {
         // TODO query the database to find the ticket with this id.
         //  if the ticket is found, then create a Ticket object and return it
         //  if the ticket is not found, return null.
-        
-        return null; // TODO replace with your code.
+    
+        String sql = "SELECT rowid, * from tickets where rowid = ?";
+        try (Connection connection = DriverManager.getConnection(dbURI);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+    
+            statement.setInt(1, id);
+            ResultSet rs = statement.executeQuery();
+            rs.next();
+            return rowToTicket(rs);
+            
+        } catch (SQLException e) {
+            System.out.println("Error get by id because " + e.getMessage());
+            return null;
+        }
+         //   return null; // TODO replace with your code.
     }
     
     
     public void updateTicket(Ticket ticket) {
         // TODO Use the Ticket's ID to modify the row in the database with this ID
         //  modify row in the database to set the values contained in the Ticket object
+    
+        String sql = "UPDATE tickets  values (?, ?, ?, ?, ?, ?, ?) where rowid = ? ";
+        try (Connection connection = DriverManager.getConnection(dbURI);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            
+            statement.setString(1, ticket.getDescription());
+            statement.setInt(2, ticket.getPriority());
+            statement.setString(3, ticket.getDescription());
+            statement.setLong(4, ticket.getDateReportedTimeStamp());
+            statement.setString(5, ticket.getResolution());
+            statement.setLong(6, ticket.getDateResolvedTimeStamp());
+            statement.setString(7, ticket.getStatus().name());
+            
+            statement.setInt(8, ticket.getTicketID());
+            
+            statement.executeUpdate();
+         
+        
+        } catch (SQLException e) {
+            System.out.println("Error get by id because " + e.getMessage());
+        }
     }
     
     
@@ -143,8 +222,25 @@ public class TicketStore {
         //  The search should be case-insensitive.
         //  The search should return partial matches.
         //  A search for "server" should return a ticket with description "The Windows Server is down"
+    
+        String sql = "SELECT rowid, * from tickets where upper(description) like = upper(?)";
+        try (Connection connection = DriverManager.getConnection(dbURI);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
         
-        return null;  // TODO replace with your code.
+            statement.setString(1, "%" + description + "%");
+            ResultSet rs = statement.executeQuery();
+    
+            LinkedList<Ticket> tickets = new LinkedList<>();
+            while (rs.next()) {
+                tickets.add(rowToTicket(rs));
+            }
+            return tickets;
+            
+        } catch (SQLException e) {
+            System.out.println("Error get by id because " + e.getMessage());
+            return null;
+        }
+        //return null;  // TODO replace with your code.
     }
     
     
@@ -152,11 +248,25 @@ public class TicketStore {
      *  @return true if a ticket was found and deleted, false if a ticket with this ID is not in the queue */
     public boolean deleteTicketById(int deleteID) {
        
+        
         // TODO Delete ticket with this ticket ID.
         //  return true if found and deleted.
         //  If there is not ticket with this ID, return false.
         
-        return false;  // TODO replace with your code.
+        //return false;  // TODO replace with your code.
+    
+        String sql = "DELETE from tickets where rowid = ?";
+        try (Connection connection = DriverManager.getConnection(dbURI);
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+        
+            statement.setInt(1, deleteID);
+            int rows = statement.executeUpdate();
+            return rows > 0;
+            
+        } catch (SQLException e) {
+            System.out.println("Error get by id because " + e.getMessage());
+           return false;
+        }
         
     }
     

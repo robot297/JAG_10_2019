@@ -61,6 +61,8 @@ public class TicketGUI extends JFrame {
         // TODO your code here.
         //  Recommended: create methods for different tasks so this constructor isn't gigantic.
         
+        //priorityComboBox.set
+        
     }
     
     /* You don't need to modify this method. In the rest of your code, when you need to send
