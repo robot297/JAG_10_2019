@@ -1,6 +1,5 @@
-package week_10;
+package week_11;
 
-import java.util.LinkedList;
 import java.util.List;
 
 /** Manages interactions between GUI and Ticket Store DB */
@@ -12,7 +11,7 @@ public class TicketProgram {
     
     TicketProgram(TicketGUI gui, TicketStore store) {
         ticketGUI = gui;
-        ticketGUI.setController(this);
+        //ticketGUI.setController(this);
         ticketStore = store;
     }
     

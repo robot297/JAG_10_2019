@@ -1,4 +1,4 @@
-## Java Lab 10, Java GUIs
+## Java Lab 11, Java GUIs and Databases
 
 ### Support Ticket GUI
 

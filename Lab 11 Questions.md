@@ -1,4 +1,4 @@
-# Lab 10: More GUI programs: Support Ticket Application
+# Lab 11: More GUI programs: Support Ticket Application
 
 This program adds a GUI and database to the command line Support Ticket application from a previous lab.
 

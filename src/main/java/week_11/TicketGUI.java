@@ -1,4 +1,4 @@
-package week_10;
+package week_11;
 
 import javax.swing.*;
 import java.util.Date;
@@ -7,7 +7,7 @@ import java.util.List;
 
 public class TicketGUI extends JFrame {
     
-    // TODO complete the tasks described in Lab 10 Questions.md
+    // TODO complete the tasks described in Lab 11 Questions.md
     
     protected JPanel mainPanel;
     
@@ -56,7 +56,16 @@ public class TicketGUI extends JFrame {
     private TicketProgram controller;
     
     
-    TicketGUI() {
+    TicketGUI(TicketProgram controller) {
+
+        /* In the rest of your code, when you need to send
+        a message to the TicketProgram controller, use this controller object. So if you need
+        to add a new ticket, you'll create a new Ticket object, then ask the TicketProgram controller
+        to add the new Ticket to the database with
+        controller.newTicket(myNewTicket);  */
+
+        this.controller = controller;
+        
         setContentPane(mainPanel);
         pack();
         setVisible(true);
@@ -179,15 +188,7 @@ public class TicketGUI extends JFrame {
         ticketListModel.addAll(all);
     }
     
-    /* You don't need to modify this method. In the rest of your code, when you need to send
-    a message to the TicketProgram controller, use this controller object. So if you need
-    to add a new ticket, you'll create a new Ticket object, then ask the TicketProgram controller
-    to add the new Ticket to the database with
-    controller.newTicket(myNewTicket);
-    */
-    public void setController(TicketProgram controller) {
-        this.controller = controller;
-    }
+
     
     // Call this method to quit the program. The tests expect you to use it.
     protected void quitProgram() {
