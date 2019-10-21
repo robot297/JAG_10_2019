@@ -1,6 +1,8 @@
 package week_10;
 
 import javax.swing.*;
+import java.util.Date;
+import java.util.List;
 
 
 public class TicketGUI extends JFrame {
@@ -36,6 +38,8 @@ public class TicketGUI extends JFrame {
     // Deleting
     protected JButton deleteSelectedButton;
     
+    protected DefaultListModel<Ticket> ticketListModel;
+    
     
     // Messages for showing in ticketListStatusDescription
     // TODO Use these instead of your own Strings, the tests expect you to use these constants
@@ -61,8 +65,118 @@ public class TicketGUI extends JFrame {
         // TODO your code here.
         //  Recommended: create methods for different tasks so this constructor isn't gigantic.
         
-        //priorityComboBox.set
+        ticketListModel = new DefaultListModel<>();
+        ticketList.setModel(ticketListModel);
+        ticketList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
+        for (int x = 1; x <= 5 ; x++) {
+            priorityComboBox.addItem(x);
+        }
+        
+        showAllTickets();
+        
+        showAllTicketsButton.addActionListener(e -> {
+            showAllTickets();
+        });
+        
+        addButton.addActionListener(e -> {
+            addTicket();
+        });
+        
+        searchIdButton.addActionListener( e -> {
+            searchByID();
+        });
+        
+        searchDescriptionButton.addActionListener( e-> {
+            searchByDescription();
+        });
+        
+        deleteSelectedButton.addActionListener( e -> {
+            deleteSelected();
+        });
+    }
+    
+    private void deleteSelected() {
+        
+        Ticket selected = ticketList.getSelectedValue();
+        if (selected == null) {
+            showMessageDialog("Select a ticket");
+            return;
+        } else {
+            String res = showInputDialog("Enter resolution");
+            selected.setResolution(res);
+            selected.setDateResolved(new Date());
+            selected.setStatus(Ticket.TicketStatus.RESOLVED);
+            controller.updateTicket(selected);
+            
+            showAllTickets();
+            ticketListStatusDescription.setText(ALL_TICKETS);
+        }
+        
+    }
+    
+    private void searchByDescription() {
+        String search = descriptionSearchTextBox.getText();
+        if (!search.isBlank()) {
+            
+            List<Ticket> tickets = controller.searchByDescription(search);
+            if (tickets.isEmpty()) {
+                ticketListStatusDescription.setText(NO_TICKETS_FOUND);
+                ticketListModel.clear();
+            } else {
+                ticketListStatusDescription.setText(TICKETS_MATCHING_DESCRIPTION);
+                ticketListModel.clear();
+                ticketListModel.addAll(tickets);
+            }
+            
+        } else {
+            ticketListModel.clear();
+            ticketListStatusDescription.setText(NO_TICKETS_FOUND);
+        }
+    }
+    
+    private void searchByID() {
+        
+        String idStr = idSearchTextBox.getText();
+        try {
+            int id = Integer.parseInt(idStr);
+            if (id <= 0) {
+                throw new NumberFormatException("Positive only");
+            }
+            Ticket ticket = controller.searchById(id);
+            if (ticket != null) {
+                ticketListModel.clear();
+                ticketListModel.addElement(ticket);
+                ticketListStatusDescription.setText(TICKET_MATCHING_ID);
+            } else {
+                ticketListModel.clear();
+                ticketListStatusDescription.setText(NO_TICKETS_FOUND);
+            }
+            
+        } catch (NumberFormatException e ) {
+          showMessageDialog("Enter a positive integer.");
+          ticketListModel.clear();
+          ticketListStatusDescription.setText(INVALID_TICKET_ID);
+        }
+    }
+    
+    void addTicket() {
+        
+        String desc = descriptionTextField.getText();
+        String rep = reporterTextField.getText();
+        int priority = (int)priorityComboBox.getSelectedItem();
+        
+        if (desc.isBlank() || rep.isBlank() || priorityComboBox.getSelectedItem() == null) {
+            controller.addTicket(new Ticket(desc, priority, rep, new Date()));
+        } else {
+            showMessageDialog("Fill in all the data.");
+        }
+    }
+    
+    
+    void showAllTickets() {
+        List<Ticket> all = controller.loadTicketsFromTicketStore();
+        ticketListModel.addAll(all);
     }
     
     /* You don't need to modify this method. In the rest of your code, when you need to send

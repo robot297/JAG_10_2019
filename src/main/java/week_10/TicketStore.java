@@ -112,6 +112,7 @@ public class TicketStore {
         //  Write the data from the fields in the newTicket object.
         
         String sql = "INSERT INTO tickets values (?, ?, ?, ?, ?, ?, ?)";
+        
         try (Connection connection = DriverManager.getConnection(dbURI);
              PreparedStatement statement = connection.prepareStatement(sql)) {
             
@@ -173,9 +174,12 @@ public class TicketStore {
     
             statement.setInt(1, id);
             ResultSet rs = statement.executeQuery();
-            rs.next();
-            return rowToTicket(rs);
-            
+            boolean ticket = rs.next();
+            if (ticket) {
+                return rowToTicket(rs);
+            } else {
+                return null;
+            }
         } catch (SQLException e) {
             System.out.println("Error get by id because " + e.getMessage());
             return null;
@@ -188,7 +192,7 @@ public class TicketStore {
         // TODO Use the Ticket's ID to modify the row in the database with this ID
         //  modify row in the database to set the values contained in the Ticket object
     
-        String sql = "UPDATE tickets  values (?, ?, ?, ?, ?, ?, ?) where rowid = ? ";
+        String sql = "UPDATE tickets values (?, ?, ?, ?, ?, ?, ?) where rowid = ? ";
         try (Connection connection = DriverManager.getConnection(dbURI);
              PreparedStatement statement = connection.prepareStatement(sql)) {
             
