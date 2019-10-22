@@ -1,0 +1,1 @@
+git ignores empty directories. So this file is here to make git add the temporary_directory_for_test_files to the project.
