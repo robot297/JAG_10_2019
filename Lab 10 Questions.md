@@ -11,12 +11,14 @@ If you want to quit these tests, press Control+Shift+A.**
 
 You will not need to modify the GUI design, or add or remove any components from WishListGUI.form. 
 
+
 ## Task 1: Set up JList Models
 
 The GUI has two JLists - one for the names of places the user wishes to go to `wishList`, and names of places the user has visited, `visitedList`.
 
 These lists should be lists of Strings.
 Create and assign a model of Strings for both lists. 
+
 
 ## Task 2: Add a new place 
 
@@ -34,16 +36,18 @@ For this program, you can assume two place names in different cases are the same
 
 Important! You must use the `showMessageDialog` method to show a message dialog. 
  
+ 
 ## Task 3: Marking a place visited 
 
 Add a JPopupMenu to the `wishList`. It will have two menu items,
 
--Visited!
+-Visited!  
 -Delete
 
 The JMenuItems should have the exact text "Visited!" and "Delete".
 
 When the user right-clicks on a place and selects "Visited!" the place should be removed from the `wishList` and added to the `visitedList`.
+
 
 ## Task 4: Deleting a WishList Place 
 
@@ -54,6 +58,7 @@ For this task, implement the Delete menu item.
 When the user right-clicks and selects Delete from the menu, remove the place from the `wishList`.
 
 Do not show any dialogs, or ask for confirmation. Just remove the place from the `wishList`.
+
 
 ## Task 5: Deleting a Visited Place 
 
@@ -80,9 +85,11 @@ In Storage.java, finish the `writeListToFile` method. Write the list of String p
 
 Write the lines in the same order as they are displayed in the JList.
 
-Overwrite any existing file. 
+Overwrite any existing files. 
 
-Use the try-with-resources style of exception handling.  `Storage.writeListToFile` should NOT declare it throws any exceptions. 
+Use the try-with-resources style of exception handling.  
+
+The Storage.java `writeListToFile` method should NOT declare it throws any exceptions. 
 
 ## Task 7: Loading Saved Places 
 
@@ -92,7 +99,9 @@ When the program is launched, this method is called.
 
 Write code to read all of the Strings from the filename, add each String to a list, and return it.
 
-Use the try-with-resources style of exception handling.  `Storage.writeListToFile` should NOT declare it throws any exceptions. 
+Use the try-with-resources style of exception handling.  
+
+The Storage.java `writeListToFile` method should NOT declare it throws any exceptions. 
 
 If the filename is not found, or if there are any other IOException thrown, return an empty list. 
 
