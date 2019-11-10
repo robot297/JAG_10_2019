@@ -6,8 +6,8 @@ For this lab, you will implement a GUI for the program.
 
 You will be working with lists of String place names. You don't need a Place class.
 
-**IMPORTANT TEST INFO for `WishListMenuTest.java` These tests uses AssertJ to launch the GUI, and use the mouse and keyboard to enter data, click buttons etc. When these tests launch, let them run to completion. Don't click anywhere outside the Wishlist program. If they get stuck, they'll time out and stop within 20 seconds.
-If you want to quit these tests, press Control+Shift+A.**
+**IMPORTANT TEST INFO for `WishListMenuTest.java` These tests use a different testing library, AssertJ. This launches the GUI, and uses the mouse and keyboard to enter data, click buttons etc. When these tests launch, let them run to completion. Don't click anywhere outside the Wishlist program. Otherwise, the tests may get stuck or start clicking/typing in other applications running on your computer! If they get stuck, they'll time out and stop within 20 seconds.
+If you want to quit these tests as they are running, press Control+Shift+A.**
 
 You will not need to modify the GUI design, or add or remove any components from WishListGUI.form. 
 
