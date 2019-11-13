@@ -26,7 +26,5 @@ public class Main {
     public static void quit(List<String> wishList, List<String> visitedList) {
         storage.writeListToFile(wishList, wishListFile);
         storage.writeListToFile(visitedList, visitedFile);
-        
-        System.exit(0);    // Ends the program
     }
 }
