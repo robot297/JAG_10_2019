@@ -25,8 +25,8 @@ public class WishListGUITest {
     public void useTempFiles() throws IOException {
         File tempDirectory = new File("temporary_directory_for_test_files");
     
-        File tempVisited = File.createTempFile("test_visited", "txt", tempDirectory);
-        File tempWishlist = File.createTempFile("test_wishlist", "txt", tempDirectory);
+        File tempVisited = File.createTempFile("test_visited", ".txt", tempDirectory);
+        File tempWishlist = File.createTempFile("test_wishlist", ".txt", tempDirectory);
     
         Main.wishListFile = tempWishlist.getPath();
         Main.visitedFile = tempVisited.getPath();
