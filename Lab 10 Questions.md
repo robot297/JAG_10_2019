@@ -91,6 +91,8 @@ Use the try-with-resources style of exception handling.
 
 The Storage.java `writeListToFile` method should NOT declare it throws any exceptions. 
 
+Finally, in your saveQuitButton event handler in the GUI, call `dispose()` to close the GUI window and end the program. 
+
 ## Task 7: Loading Saved Places 
 
 Finish the `readListFromFile` method in Storage.java. 
