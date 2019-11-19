@@ -6,7 +6,9 @@ For this lab, you will implement a GUI for the program.
 
 You will be working with lists of String place names. You don't need a Place class.
 
-**IMPORTANT TEST INFO for `WishListMenuTest.java` These tests use a different testing library, AssertJ. This launches the GUI, and uses the mouse and keyboard to enter data, click buttons etc. When these tests launch, let them run to completion. Don't click anywhere outside the Wishlist program. Otherwise, the tests may get stuck or start clicking/typing in other applications running on your computer! If they get stuck, they'll time out and stop within 20 seconds.
+## IMPORTANT TEST INFO 
+
+**Important test info the tests in `WishListMenuTest.java` These tests use a different testing library, AssertJ. This launches the GUI, and uses the mouse and keyboard to enter data, click buttons etc. When these tests launch, let them run to completion. Don't click anywhere outside the Wishlist program. Otherwise, the tests may get stuck or start clicking/typing in other applications running on your computer! If they get stuck, they'll time out and stop within 20 seconds.
 If you want to quit these tests as they are running, press Control+Shift+A.**
 
 You will not need to modify the GUI design, or add or remove any components from WishListGUI.form. 
@@ -17,7 +19,7 @@ You will not need to modify the GUI design, or add or remove any components from
 The GUI has two JLists - one for the names of places the user wishes to go to `wishList`, and names of places the user has visited, `visitedList`.
 
 These lists should be lists of Strings.
-Create and assign a model of Strings for both lists. 
+Create and assign a DefaultListModel of Strings for both lists. 
 
 
 ## Task 2: Add a new place 
@@ -26,15 +28,15 @@ Add an event listener to the `addButton` JButton.
 
 When this button is clicked, read the text entered in `newPlaceNameTextField`.
 
-If the text is blank, then don't do anything. Don't add anything to the `wishList`.
+If the text is blank - for example, empty, or just spaces, then don't do anything. Don't add anything to the `wishList`.
 
-If the text is not blank, add the new place to the wish list model, to add it to the `wishList` JList.  Clear the text in `newPlaceNameTextField`.
+If the text is not blank, add the new place to the wishlist model, to add it to the `wishList` JList.  Clear the text in `newPlaceNameTextField`.
 
 The program should not accept duplicate names. If the place name is already in the `wishList`, then display an alert dialog using the `showMessageDialog` method provided for you in `WishListGUI.java`.  Do not add the place name again.
 
 For this program, you can assume two place names in different cases are the same place. So your program should NOT permit "new york" if "New York" is already in the list.  
 
-Important! You must use the `showMessageDialog` method to show a message dialog. 
+**Important!** You must use the `showMessageDialog` method to show a message dialog. 
  
  
 ## Task 3: Marking a place visited 
@@ -55,7 +57,7 @@ You added a JPopupMenu for the `wishList` for Task 3.
 
 For this task, implement the Delete menu item.
 
-When the user right-clicks and selects Delete from the menu, remove the place from the `wishList`.
+When the user right-clicks and selects "Delete" from the menu, remove the place from the `wishList`.
 
 Do not show any dialogs, or ask for confirmation. Just remove the place from the `wishList`.
 
@@ -70,7 +72,7 @@ This menu has one item
 
 Use this exact text for the JMenuItem.
 
-When the user right-clicks and selects Delete from the menu, remove the place from the `visitedList`.
+When the user right-clicks and selects "Delete" from the menu, remove the place from the `visitedList`.
 
 Do not show any dialogs, or ask for confirmation. Just remove the place from the `visitedList`.
 
@@ -91,7 +93,7 @@ Use the try-with-resources style of exception handling.
 
 The Storage.java `writeListToFile` method should NOT declare it throws any exceptions. 
 
-Finally, in your saveQuitButton event handler in the GUI, call `dispose()` to close the GUI window and end the program. 
+Finally, in your `saveQuitButton` event handler in the GUI, call `dispose()` to close the GUI window and end the program. 
 
 ## Task 7: Loading Saved Places 
 
@@ -109,4 +111,4 @@ If the filename is not found, or if there are any other IOException thrown, retu
 
 In WishListGUI.java, the constructor is called with a list of `wishListPlaces`, and a list of `visitedPlaces`.  In the constructor, use these lists to add places to the `wishList` and `visitedList` JLists. Add the place names in the same order as they are found in the files.
 
-So, when the program starts, it will read lists of places from file. It will display places read from file in the JLists.  When user saves and quits, all of the places in the `wishList` and `visitedList` will be written to file. So the next time the program starts, these places will be displayed. 
+So, when the program starts, it will read lists of places from file. It will display places read from file in the JLists.  When user saves and quits, all of the places in the `wishList` and `visitedList` will be written to file. So the next time the program starts, the places in the files will be displayed. 
